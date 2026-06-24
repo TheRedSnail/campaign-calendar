@@ -1,0 +1,11 @@
+node_modules
+dist
+*.local
+.DS_Store
+
+# Nuxt UI (Vue mode) generated type files
+auto-imports.d.ts
+components.d.ts
+
+# TypeScript build info
+tsconfig.tsbuildinfo
