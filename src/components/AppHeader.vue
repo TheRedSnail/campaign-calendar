@@ -74,6 +74,15 @@ function today() {
         </button>
       </div>
 
+      <UButton
+        to="/coordinator"
+        icon="i-lucide-layout-dashboard"
+        label="Coordinator"
+        color="neutral"
+        variant="outline"
+        size="sm"
+      />
+
       <UButton icon="i-lucide-plus" label="New campaign" color="primary" size="sm" @click="newCampaign" />
     </div>
   </header>

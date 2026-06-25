@@ -38,23 +38,20 @@ const loctiteProduction: ProductionData = {
   slaCaption: 'on track · 1 at risk · 0 overdue',
   timeToGoLive: '7 days',
   timeToGoLiveCaption: 'working days · go-live 03 Jul',
-  // Overarching campaign stepper — keeps the broader statuses.
+  // Overarching campaign stepper — the broader statuses.
   progressStages: [
-    { label: 'Briefed', dot: 'gray', count: '5/5', avgAfter: '0.5 d' },
-    { label: 'Accepted', dot: 'blue', count: '5/5', avgAfter: '0.6 d' },
-    { label: 'In progress', dot: 'amber', count: '4/5', avgAfter: '3.8 d' },
-    { label: 'QA', dot: 'amber', count: '3/5', avgAfter: '1.4 d' },
-    { label: 'Business review', dot: 'amber', count: '2/5', avgAfter: '1.5 d' },
-    { label: 'Ready for UAT', dot: 'blue', count: '1/5', avgAfter: '0.8 d' },
-    { label: 'Ready for go-live', dot: 'blue', count: '1/5', avgAfter: '0.9 d' },
-    { label: 'Live', dot: 'green', count: '1/5' },
+    { label: 'Briefed', dot: 'gray' },
+    { label: 'Accepted', dot: 'blue' },
+    { label: 'In progress', dot: 'amber' },
+    { label: 'Ready for UAT', dot: 'blue' },
+    { label: 'Live', dot: 'green' },
   ],
   // Production-timeline Gantt rows. Positions are business-day indices on the
   // axis (0 = 12 Jun brief date … 15 = 03 Jul go-live, see AXIS in the view).
   elements: [
     { name: 'Landing page', status: 'On track', currentStage: 'In progress', start: 5, doneEnd: 6, currentEnd: 12, end: 15, marker: 'open' },
-    { name: 'Form', status: 'On track', currentStage: 'QA', start: 2, doneEnd: 8, currentEnd: 10, end: 13, marker: 'open' },
-    { name: 'Email', status: 'On track', currentStage: 'Business review', start: 1, doneEnd: 10, currentEnd: 11.5, end: 12.5, marker: 'open' },
+    { name: 'Form', status: 'On track', currentStage: 'In progress', start: 2, doneEnd: 8, currentEnd: 10, end: 13, marker: 'open' },
+    { name: 'Email', status: 'On track', currentStage: 'Ready for UAT', start: 1, doneEnd: 10, currentEnd: 11.5, end: 12.5, marker: 'open' },
     { name: 'UTM campaign name', status: 'Complete', currentStage: 'Live', start: 0.5, doneEnd: 6, currentEnd: 6, end: 6, marker: 'done' },
     { name: 'Tracking pixel implementation', status: 'At risk', currentStage: 'Briefed', start: 6, doneEnd: 6.7, currentEnd: 6.7, end: 17, marker: 'risk' },
   ],
@@ -66,8 +63,8 @@ export const seedCampaigns: Campaign[] = [
     name: 'Loctite 243 Relaunch',
     brand: 'Loctite',
     sbu: 'Industrial',
-    status: 'in_progress',
-    progress: 40,
+    status: 'in_production',
+    progress: 54,
     startDate: '2026-06-03',
     endDate: '2026-06-12',
     campaignType: 'Product relaunch',
@@ -219,7 +216,7 @@ export const seedCampaigns: Campaign[] = [
     name: 'Technomelt EMEA Push',
     brand: 'Technomelt',
     sbu: 'Packaging',
-    status: 'in_progress',
+    status: 'in_production',
     progress: 75,
     startDate: '2026-06-22',
     endDate: '2026-07-03',
@@ -316,7 +313,7 @@ export const seedCampaigns: Campaign[] = [
     name: 'Teroson Q3 Industrial Push',
     brand: 'Teroson',
     sbu: 'Industrial',
-    status: 'in_progress',
+    status: 'in_production',
     progress: 50,
     startDate: '2026-06-29',
     endDate: '2026-07-08',
@@ -338,3 +335,13 @@ export const seedCampaigns: Campaign[] = [
     recipients: [],
   },
 ]
+
+// Assign a campaign coordinator (the marketing-ops PM) to every campaign.
+// Jan Stoker is the logged-in coordinator; a couple are run by a colleague for variety.
+const COORDINATOR_OVERRIDE: Record<string, string> = {
+  'technomelt-packaging-demo': 'M. Sauer',
+  'technomelt-emea-push': 'M. Sauer',
+}
+for (const c of seedCampaigns) {
+  c.coordinator = COORDINATOR_OVERRIDE[c.id] ?? 'Jan Stoker'
+}

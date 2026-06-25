@@ -47,9 +47,8 @@ export interface Recipient {
 /** Simplified per-element production-timeline stages. */
 export type ElementStage =
   | 'Briefed'
+  | 'Accepted'
   | 'In progress'
-  | 'QA'
-  | 'Business review'
   | 'Ready for UAT'
   | 'Live'
 
@@ -61,8 +60,6 @@ export type ProgressDot = 'gray' | 'blue' | 'amber' | 'green'
 export interface CampaignProgressStage {
   label: string
   dot: ProgressDot
-  count: string // e.g. "5/5"
-  avgAfter?: string // Ø time to the next stage
 }
 
 /**
@@ -78,6 +75,28 @@ export interface ProductionElement {
   currentEnd: number // end of the current-stage (amber) portion
   end: number // end of the upcoming (gray) portion
   marker: 'open' | 'done' | 'risk'
+}
+
+/** The 5 Azure DevOps work-item stages a ticket moves through (brief → go-live). */
+export type TicketStage =
+  | 'Briefed'
+  | 'Accepted'
+  | 'In progress'
+  | 'Ready for UAT'
+  | 'Live'
+
+export type TicketSla = 'On track' | 'At risk' | 'Overdue'
+
+/** One Azure DevOps work item — created per operational team when a brief is accepted. */
+export interface DevOpsTicket {
+  id: string // e.g. 'ADH-2041-EMAIL'
+  campaignId: string
+  team: string // operational team (derived from channels)
+  title: string // deliverable summary
+  stage: TicketStage
+  sla: TicketSla
+  assignee: string
+  dueDate: string // display string, e.g. '08 Jul'
 }
 
 export interface ProductionData {
@@ -121,6 +140,9 @@ export interface Campaign {
   // Ownership
   owner: string
   ownerEmail: string
+
+  /** Campaign coordinator (marketing-ops PM) — the single point of contact. */
+  coordinator?: string
 
   notes: string
   assets: CampaignAssets

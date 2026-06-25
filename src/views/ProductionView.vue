@@ -98,22 +98,16 @@ function back() {
         <!-- Campaign progress (overarching broad statuses) -->
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <p class="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress</p>
-          <div class="flex items-start">
+          <div class="flex items-center">
             <template v-for="(stage, i) in prod.progressStages" :key="stage.label">
-              <div class="flex shrink-0 flex-col gap-1.5">
-                <div class="flex items-center gap-2">
-                  <span class="size-2 rounded-full" :class="DOT[stage.dot]" />
-                  <span class="whitespace-nowrap text-sm font-medium text-gray-800">{{ stage.label }}</span>
-                </div>
-                <span class="pl-4 text-xs text-gray-400">{{ stage.count }}</span>
+              <div class="flex shrink-0 items-center gap-2">
+                <span class="size-2 rounded-full" :class="DOT[stage.dot]" />
+                <span class="whitespace-nowrap text-sm font-medium text-gray-800">{{ stage.label }}</span>
               </div>
               <div
                 v-if="i < prod.progressStages.length - 1"
-                class="flex flex-1 flex-col items-center px-1.5 pt-0.5"
-              >
-                <span class="whitespace-nowrap text-[11px] font-medium text-blue-600">Ø {{ stage.avgAfter }}</span>
-                <span class="mt-1.5 h-px w-full bg-gray-200" />
-              </div>
+                class="mx-1.5 h-px flex-1 bg-gray-200"
+              />
             </template>
           </div>
         </div>
@@ -124,7 +118,7 @@ function back() {
             <div>
               <h2 class="text-base font-semibold text-gray-900">Production timeline</h2>
               <p class="mt-0.5 text-xs text-gray-400">
-                {{ prod.elements.length }} elements · brief → go-live · 8 stages over 10 business days each
+                {{ prod.elements.length }} elements · brief → go-live · 5 stages over 10 business days each
               </p>
             </div>
             <div class="flex items-center gap-4 text-xs text-gray-500">
