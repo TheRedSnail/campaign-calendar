@@ -1,7 +1,27 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import { useAuth } from '../../composables/useAuth'
+import { ROLE_LABELS } from '../../data/options'
 
 const route = useRoute()
+const router = useRouter()
+const { displayName, role, logout } = useAuth()
+
+const roleLabel = computed(() => (role.value ? ROLE_LABELS[role.value] : ''))
+const initials = computed(() =>
+  displayName.value
+    .split(/[\s@.]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join(''),
+)
+
+async function onLogout() {
+  await logout()
+  router.push('/login')
+}
 
 const tabs = [
   { to: '/coordinator', label: 'Dashboard', exact: true },
@@ -38,8 +58,15 @@ function isActive(t: { to: string; exact?: boolean }) {
       </nav>
       <div class="flex-1" />
       <span class="text-sm font-medium text-gray-500">Wed · 24 Jun 2026</span>
-      <div class="flex size-8 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white">
-        JS
+      <div class="flex items-center gap-2 border-l border-gray-200 pl-3">
+        <div class="text-right leading-tight">
+          <p class="text-sm font-medium text-gray-900">{{ displayName }}</p>
+          <p class="text-[11px] text-gray-400">{{ roleLabel }}</p>
+        </div>
+        <div class="flex size-8 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white">
+          {{ initials }}
+        </div>
+        <UButton icon="i-lucide-log-out" color="neutral" variant="ghost" size="sm" aria-label="Sign out" @click="onLogout" />
       </div>
     </header>
 

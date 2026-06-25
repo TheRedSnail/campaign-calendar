@@ -1,9 +1,15 @@
 import type { Brand, CampaignStatus } from '../types'
+import type { AppRole } from '../types/database'
 
 export const TODAY = '2026-06-24'
 
-/** The logged-in coordinator. In a real app this would come from auth/session. */
-export const CURRENT_USER = { name: 'Jan Stoker', firstName: 'Jan' }
+/** Human labels for the four roles (used in the header + admin screen). */
+export const ROLE_LABELS: Record<AppRole, string> = {
+  campaign_owner: 'Campaign owner',
+  campaign_coordinator: 'Campaign coordinator',
+  run_team: 'RUN team',
+  admin: 'Admin',
+}
 
 export const SBU_OPTIONS = [
   'Industrial',
@@ -49,6 +55,9 @@ export const REGION_OPTIONS = [
   'China',
   'Japan',
 ]
+
+/** Country = the scoping dimension for owners (one) and RUN-team users (many). Same list. */
+export const COUNTRY_OPTIONS = REGION_OPTIONS
 
 export const CHANNEL_OPTIONS = [
   'Email',

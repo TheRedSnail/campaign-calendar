@@ -1,9 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCampaigns } from '../composables/useCampaigns'
+import { useAuth } from '../composables/useAuth'
+import { ROLE_LABELS } from '../data/options'
 import { addMonths, monthLabel } from '../utils/dates'
 
+const router = useRouter()
 const { currentMonth, viewMode, filters, newCampaign } = useCampaigns()
+const { canSeeCoordinator, isAdmin, isOwner, role, displayName, logout } = useAuth()
+
+async function onLogout() {
+  await logout()
+  router.push('/login')
+}
+
+const roleLabel = computed(() => (role.value ? ROLE_LABELS[role.value] : ''))
+const canCreate = computed(() => isOwner.value || isAdmin.value)
 
 const periodLabel = computed(() =>
   viewMode.value === 'timeline' ? 'Jun – Jul 2026' : monthLabel(currentMonth.value),
@@ -78,6 +91,7 @@ function today() {
       </div>
 
       <UButton
+        v-if="canSeeCoordinator"
         to="/coordinator"
         icon="i-lucide-layout-dashboard"
         label="Coordinator"
@@ -87,6 +101,17 @@ function today() {
       />
 
       <UButton
+        v-if="isAdmin"
+        to="/admin"
+        icon="i-lucide-users"
+        label="Users"
+        color="neutral"
+        variant="outline"
+        size="sm"
+      />
+
+      <UButton
+        v-if="isAdmin"
         to="/config"
         icon="i-lucide-settings"
         label="Settings"
@@ -95,7 +120,16 @@ function today() {
         size="sm"
       />
 
-      <UButton icon="i-lucide-plus" label="New campaign" color="primary" size="sm" @click="newCampaign" />
+      <UButton v-if="canCreate" icon="i-lucide-plus" label="New campaign" color="primary" size="sm" @click="newCampaign" />
+
+      <!-- User chip -->
+      <div class="flex items-center gap-2 border-l border-gray-200 pl-3">
+        <div class="text-right leading-tight">
+          <p class="text-sm font-medium text-gray-900">{{ displayName }}</p>
+          <p class="text-[11px] text-gray-400">{{ roleLabel }}</p>
+        </div>
+        <UButton icon="i-lucide-log-out" color="neutral" variant="ghost" size="sm" aria-label="Sign out" @click="onLogout" />
+      </div>
     </div>
   </header>
 </template>

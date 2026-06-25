@@ -7,6 +7,7 @@ import AssetCard from './AssetCard.vue'
 import FileUpload from './FileUpload.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
+import { useAuth } from '../composables/useAuth'
 import { useCompletion, assetComplete, type SectionStatus } from '../composables/useCompletion'
 import {
   SBU_OPTIONS,
@@ -15,6 +16,7 @@ import {
   PRIORITY_OPTIONS,
   LANGUAGE_OPTIONS,
   REGION_OPTIONS,
+  COUNTRY_OPTIONS,
   CHANNEL_OPTIONS,
   OWNER_OPTIONS,
   STATUS_META,
@@ -23,6 +25,8 @@ import type { CampaignStatus } from '../types'
 
 const router = useRouter()
 const { selected, drawerOpen, closeDrawer, openBrief, touchSelected } = useCampaigns()
+// Owners are locked to their own SBU + country (preselected on create).
+const { isOwner } = useAuth()
 const { ticketsFor } = useCoordinator()
 const { sections, done, total, canBrief, percent } = useCompletion(selected)
 
@@ -108,7 +112,11 @@ const check = 'i-lucide-check'
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">SBU</label>
-              <USelect v-model="selected.sbu" :items="SBU_OPTIONS" placeholder="Select SBU" class="w-full" @update:model-value="onChange" />
+              <USelect v-model="selected.sbu" :items="SBU_OPTIONS" placeholder="Select SBU" class="w-full" :disabled="isOwner" @update:model-value="onChange" />
+            </div>
+            <div>
+              <label class="mb-1 block text-[13px] font-medium text-gray-500">Country</label>
+              <USelect v-model="selected.country" :items="COUNTRY_OPTIONS" placeholder="Select country" class="w-full" :disabled="isOwner" @update:model-value="onChange" />
             </div>
             <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Brand</label>

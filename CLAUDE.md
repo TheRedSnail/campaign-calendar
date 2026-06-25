@@ -3,12 +3,31 @@
 Working prototype of the **Campaign Calendar** wireframes (Henkel Adhesives), built from the
 Figma file _Campaign Calendar — Wireframes_
 (`https://www.figma.com/design/6KNP9QWvlyBGc3em9hYUxS/Campaign-Calendar-%E2%80%94-Wireframes`).
-It is a UI prototype: **all data is mock data and nothing is persisted.**
+**This `supabase` branch** backs the prototype with a real **Supabase** project: campaigns, DevOps
+tickets and user profiles are persisted in Postgres, there is a **login** with four roles, and
+**Row-Level Security** enforces who sees what. (The pure-mock, no-backend version lives on the
+`prototype` branch / `main`.)
 
 ## Stack
 
 Vite + Vue 3 (`<script setup>`) · TypeScript · [Nuxt UI](https://ui.nuxt.com) (Vue/Vite mode) ·
-Tailwind CSS v4 · vue-router (history mode).
+Tailwind CSS v4 · vue-router (history mode) · **[Supabase](https://supabase.com)** (Auth, Postgres,
+Row-Level Security, Edge Functions) via `@supabase/supabase-js`.
+
+## Auth & roles (Supabase)
+
+- The client lives in `src/lib/supabase.ts` (reads `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` —
+  see `.env.example`). `composables/useAuth.ts` holds the session + profile and is awaited by the
+  router guard in `main.ts` before the first navigation (so a hard reload of a deep route doesn't
+  race auth). DB rows ↔ TS types are mapped in `src/data/mappers.ts`.
+- **Four roles** (`profiles.role`): **campaign_owner** (calendar only; one SBU + one country,
+  preselected & locked when creating a campaign), **campaign_coordinator** (calendar + coordinator
+  views; many SBUs), **run_team** (calendar + coordinator views; scoped by country, or `is_global`),
+  **admin** (everything + the `/admin` user-management screen).
+- Visibility is enforced by **RLS** in Postgres, not the client — `filtered` in `useCampaigns` is now
+  pure UX on top of the already-scoped rows. Schema, policies, seed data and the `admin-users` Edge
+  Function are in `supabase/` (see `supabase/README.md`); the project ref is `hvzrhyitjapnxrzilzoq`.
+- Demo logins (password `Demo1234!`): `admin@`, `owner@`, `coordinator@`, `run@demo.henkel`.
 
 ## Commands
 

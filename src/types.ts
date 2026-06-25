@@ -84,6 +84,9 @@ export interface Campaign {
   language: string
   costCenter: string
 
+  /** Primary market — drives RUN-team visibility and is preselected from the owner's profile. */
+  country: string
+
   // Targeting
   regions: string[]
   channels: string[]

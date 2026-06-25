@@ -1,26 +1,41 @@
 import { computed, reactive } from 'vue'
 import type { Campaign, DevOpsTicket, TicketSla, TicketStage } from '../types'
 import { useCampaigns } from './useCampaigns'
-import { CURRENT_USER, OWNER_OPTIONS, TODAY } from '../data/options'
+import { useAuth } from './useAuth'
+import { OWNER_OPTIONS, TODAY } from '../data/options'
 import {
   generateTickets,
-  seedTickets,
   STAGE_DOT,
   TEAM_ORDER,
   TICKET_STAGES,
 } from '../data/coordinator'
+import { supabase } from '../lib/supabase'
+import { rowToTicket, ticketToRow } from '../data/mappers'
 
 const { campaigns } = useCampaigns()
-
-const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v))
+const { profile } = useAuth()
 
 interface CoordState {
   tickets: DevOpsTicket[]
 }
 
 const state = reactive<CoordState>({
-  tickets: clone(seedTickets),
+  tickets: [], // hydrated from Supabase after auth (see loadTickets)
 })
+
+/** Replace the local ticket set from Supabase (RLS scopes to visible campaigns). */
+async function loadTickets() {
+  const { data, error } = await supabase.from('devops_tickets').select('*')
+  if (error) {
+    console.error('loadTickets', error)
+    return
+  }
+  state.tickets = (data ?? []).map(rowToTicket)
+}
+
+function resetTickets() {
+  state.tickets = []
+}
 
 // ---- helpers -------------------------------------------------------------
 
@@ -124,7 +139,11 @@ const dashboardKpis = computed(() => {
 
 const myCampaigns = computed(() =>
   campaigns.value
-    .filter((c) => (c.status === 'in_production' || c.status === 'briefed') && c.coordinator === CURRENT_USER.name)
+    .filter(
+      (c) =>
+        (c.status === 'in_production' || c.status === 'briefed') &&
+        c.coordinator === profile.value?.full_name,
+    )
     .sort((a, b) => SLA_RANK[campaignSla(b)] - SLA_RANK[campaignSla(a)]),
 )
 
@@ -237,40 +256,79 @@ export const ASSIGNEE_OPTIONS = [...OWNER_OPTIONS, 'Unassigned']
 
 // ---- actions -------------------------------------------------------------
 
-/** Accept a brief → fan out one DevOps ticket per operational team, go in_production. */
-function acceptBrief(campaignId: string) {
+/** Accept a brief → atomically fan out one DevOps ticket per team and go in_production. */
+async function acceptBrief(campaignId: string) {
   const c = campaigns.value.find((x) => x.id === campaignId)
   if (!c) return
-  if (!ticketsFor(campaignId).length) state.tickets.push(...generateTickets(c))
+  const newTickets = ticketsFor(campaignId).length ? [] : generateTickets(c)
+  const { error } = await supabase.rpc('accept_brief', {
+    p_campaign_id: campaignId,
+    p_tickets: newTickets.map(ticketToRow),
+  })
+  if (error) {
+    console.error('acceptBrief', error)
+    return
+  }
   c.status = 'in_production'
+  if (newTickets.length) state.tickets.push(...newTickets)
 }
 
 /** Send a brief back to the owner for changes. */
-function requestChanges(campaignId: string) {
+async function requestChanges(campaignId: string) {
   const c = campaigns.value.find((x) => x.id === campaignId)
-  if (c) c.status = 'ready'
+  if (!c) return
+  const prev = c.status
+  c.status = 'ready'
+  const { error } = await supabase.from('campaigns').update({ status: 'ready' }).eq('id', campaignId)
+  if (error) {
+    c.status = prev
+    console.error('requestChanges', error)
+  }
 }
 
-function setTicketStage(id: string, stage: TicketStage) {
+async function setTicketStage(id: string, stage: TicketStage) {
   const t = state.tickets.find((x) => x.id === id)
   if (!t) return
+  const prev = { stage: t.stage, sla: t.sla }
   t.stage = stage
   if (stage === 'Live') t.sla = 'On track'
+  const { error } = await supabase.from('devops_tickets').update({ stage: t.stage, sla: t.sla }).eq('id', id)
+  if (error) {
+    t.stage = prev.stage
+    t.sla = prev.sla
+    console.error('setTicketStage', error)
+  }
 }
 
-function setTicketSla(id: string, sla: TicketSla) {
+async function setTicketSla(id: string, sla: TicketSla) {
   const t = state.tickets.find((x) => x.id === id)
-  if (t) t.sla = sla
+  if (!t) return
+  const prev = t.sla
+  t.sla = sla
+  const { error } = await supabase.from('devops_tickets').update({ sla }).eq('id', id)
+  if (error) {
+    t.sla = prev
+    console.error('setTicketSla', error)
+  }
 }
 
-function setTicketAssignee(id: string, assignee: string) {
+async function setTicketAssignee(id: string, assignee: string) {
   const t = state.tickets.find((x) => x.id === id)
-  if (t) t.assignee = assignee
+  if (!t) return
+  const prev = t.assignee
+  t.assignee = assignee
+  const { error } = await supabase.from('devops_tickets').update({ assignee }).eq('id', id)
+  if (error) {
+    t.assignee = prev
+    console.error('setTicketAssignee', error)
+  }
 }
 
 export function useCoordinator() {
   return {
     tickets: computed(() => state.tickets),
+    loadTickets,
+    resetTickets,
     inFlight,
     triage,
     myCampaigns,
