@@ -1,11 +1,31 @@
-import type { Campaign, ProductionData } from '../types'
+import type { BriefingAsset, Campaign, CampaignAssets, LocalizationAsset, ProductionData, TrackingAsset } from '../types'
 
-const emptyAssets = () => ({
-  emailBriefing: false,
-  landingPages: false,
-  forms: false,
-  trackingPixels: false,
-  translations: false,
+const blankBriefing = (): BriefingAsset => ({ selected: false, brief: '', reference: '', briefingDoc: '' })
+const blankTracking = (): TrackingAsset => ({ selected: false, provider: '', pixelId: '', events: '' })
+const blankLocalization = (): LocalizationAsset => ({ selected: false, languages: [] })
+
+export const emptyAssets = (): CampaignAssets => ({
+  emailBriefing: blankBriefing(),
+  landingPages: blankBriefing(),
+  forms: blankBriefing(),
+  trackingPixels: blankTracking(),
+  localization: blankLocalization(),
+})
+
+const briefing = (brief: string, briefingDoc: string, reference = ''): BriefingAsset => ({
+  selected: true,
+  brief,
+  reference,
+  briefingDoc,
+})
+
+/** All briefings selected and fully filled (a campaign that is ready to brief). */
+const fullAssets = (): CampaignAssets => ({
+  emailBriefing: briefing('Launch announcement to OEM accounts', 'email-brief.pdf'),
+  landingPages: briefing('Drive demo sign-ups; primary CTA above the fold', 'landing-brief.pdf', 'henkel.com/lp'),
+  forms: briefing('Capture name, company, application & volume', 'form-brief.pdf'),
+  trackingPixels: { selected: true, provider: 'GA4', pixelId: 'G-XXXX1234', events: 'page_view, sign_up' },
+  localization: { selected: true, languages: ['English (UK)', 'German'] },
 })
 
 const loctiteProduction: ProductionData = {
@@ -90,7 +110,7 @@ export const seedCampaigns: Campaign[] = [
     owner: 'M. Roth',
     ownerEmail: 'm.roth@henkel.com',
     notes: '',
-    assets: { emailBriefing: true, landingPages: true, forms: true, trackingPixels: true, translations: true },
+    assets: fullAssets(),
     recipients: [],
   },
   {
@@ -136,7 +156,11 @@ export const seedCampaigns: Campaign[] = [
     owner: 'S. Klein',
     ownerEmail: '',
     notes: '',
-    assets: { emailBriefing: true, landingPages: true, forms: false, trackingPixels: false, translations: false },
+    assets: {
+      ...emptyAssets(),
+      emailBriefing: briefing('Webinar invite to automotive engineers', 'nvh-email-brief.pdf'),
+      landingPages: briefing('Registration page for the NVH webinar', 'nvh-lp-brief.pdf'),
+    },
     recipients: [],
   },
   {
@@ -159,7 +183,7 @@ export const seedCampaigns: Campaign[] = [
     owner: 'J. Stoker',
     ownerEmail: 'j.stoker@henkel.com',
     notes: '',
-    assets: { emailBriefing: true, landingPages: true, forms: true, trackingPixels: true, translations: true },
+    assets: fullAssets(),
     recipients: [],
   },
   {
@@ -182,7 +206,7 @@ export const seedCampaigns: Campaign[] = [
     owner: 'L. Vogel',
     ownerEmail: 'l.vogel@henkel.com',
     notes: 'Coordinate with APAC distributor network.',
-    assets: { emailBriefing: true, landingPages: true, forms: true, trackingPixels: true, translations: true },
+    assets: fullAssets(),
     recipients: [
       { name: 'L. Vogel', role: 'Owner' },
       { name: 'APAC creative', role: '' },
@@ -210,7 +234,12 @@ export const seedCampaigns: Campaign[] = [
     owner: 'M. Roth',
     ownerEmail: '',
     notes: '',
-    assets: { emailBriefing: true, landingPages: true, forms: true, trackingPixels: false, translations: false },
+    assets: {
+      ...emptyAssets(),
+      emailBriefing: briefing('Demand-gen nurture for hot-melt adhesives', 'emea-email-brief.pdf'),
+      landingPages: briefing('Pillar page with gated guide', 'emea-lp-brief.pdf'),
+      forms: briefing('Capture contact + use case', 'emea-form-brief.pdf'),
+    },
     recipients: [],
   },
   {
@@ -302,7 +331,10 @@ export const seedCampaigns: Campaign[] = [
     owner: 'P. Adler',
     ownerEmail: '',
     notes: '',
-    assets: { emailBriefing: true, landingPages: false, forms: false, trackingPixels: false, translations: false },
+    assets: {
+      ...emptyAssets(),
+      emailBriefing: briefing('Q3 industrial push announcement', 'q3-email-brief.pdf'),
+    },
     recipients: [],
   },
 ]

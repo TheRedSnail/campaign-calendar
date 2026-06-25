@@ -23,11 +23,11 @@ const recipients = computed(() =>
 const assetList = computed(() => {
   const a = selected.value?.assets
   return [
-    { label: 'Email briefing', on: a?.emailBriefing },
-    { label: 'Landing pages', on: a?.landingPages },
-    { label: 'Forms', on: a?.forms },
-    { label: 'Tracking pixels', on: a?.trackingPixels },
-    { label: 'Translations', on: a?.translations },
+    { label: 'Email briefing', on: a?.emailBriefing.selected },
+    { label: 'Landing pages', on: a?.landingPages.selected },
+    { label: 'Forms', on: a?.forms.selected },
+    { label: 'Tracking pixels', on: a?.trackingPixels.selected },
+    { label: 'Localization', on: a?.localization.selected },
   ]
 })
 

@@ -3,8 +3,10 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import StatusBadge from './StatusBadge.vue'
 import TagMultiSelect from './TagMultiSelect.vue'
+import AssetCard from './AssetCard.vue'
+import FileUpload from './FileUpload.vue'
 import { useCampaigns } from '../composables/useCampaigns'
-import { useCompletion, type SectionStatus } from '../composables/useCompletion'
+import { useCompletion, assetComplete, type SectionStatus } from '../composables/useCompletion'
 import {
   SBU_OPTIONS,
   BRAND_OPTIONS,
@@ -44,14 +46,6 @@ function onChange() {
   touchSelected()
 }
 
-const assetItems = [
-  { key: 'emailBriefing', label: 'Email briefing' },
-  { key: 'landingPages', label: 'Landing pages' },
-  { key: 'forms', label: 'Forms' },
-  { key: 'trackingPixels', label: 'Tracking pixels' },
-  { key: 'translations', label: 'Translations' },
-] as const
-
 function viewProduction() {
   if (!selected.value) return
   const id = selected.value.id
@@ -82,7 +76,7 @@ const check = 'i-lucide-check'
       <div class="flex w-full items-start justify-between gap-3">
         <div>
           <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Campaign details</p>
-          <h2 class="mt-0.5 text-lg font-semibold text-gray-900">
+          <h2 class="mt-0.5 text-lg font-semibold text-gray-900 dark:text-white">
             {{ selected?.name || 'New campaign' }}
           </h2>
         </div>
@@ -98,7 +92,7 @@ const check = 'i-lucide-check'
         <!-- Basics -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900">Basics</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Basics</h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.basics)">{{ badgeText(sectionMap.basics) }}</span>
           </div>
           <div>
@@ -136,7 +130,7 @@ const check = 'i-lucide-check'
         <!-- Schedule -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900">Schedule</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Schedule</h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.schedule)">{{ badgeText(sectionMap.schedule) }}</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
@@ -154,7 +148,7 @@ const check = 'i-lucide-check'
         <!-- Targeting -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900">Targeting</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Targeting</h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.targeting)">{{ badgeText(sectionMap.targeting) }}</span>
           </div>
           <div>
@@ -170,7 +164,7 @@ const check = 'i-lucide-check'
         <!-- Goal / CTA -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900">Goal / CTA</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Goal / CTA</h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.goal)">{{ badgeText(sectionMap.goal) }}</span>
           </div>
           <div>
@@ -186,7 +180,7 @@ const check = 'i-lucide-check'
         <!-- Ownership -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900">Ownership</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Ownership</h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.ownership)">{{ badgeText(sectionMap.ownership) }}</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
@@ -204,24 +198,101 @@ const check = 'i-lucide-check'
         <!-- Assets & briefings -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900">Assets &amp; briefings</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Assets &amp; briefings</h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.assets)">{{ badgeText(sectionMap.assets) }}</span>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <label
-              v-for="item in assetItems"
-              :key="item.key"
-              class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700"
+          <p class="-mt-1 text-xs text-gray-400">
+            Select the assets &amp; briefings this campaign needs, then fill in each one.
+          </p>
+          <div class="flex flex-col gap-2">
+            <!-- Email briefing -->
+            <AssetCard
+              label="Email briefing"
+              :selected="selected.assets.emailBriefing.selected"
+              :complete="assetComplete('emailBriefing', selected.assets)"
+              @update:selected="(v) => { selected!.assets.emailBriefing.selected = v; onChange() }"
             >
-              <UCheckbox v-model="selected.assets[item.key]" @update:model-value="onChange" />
-              {{ item.label }}
-            </label>
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Key message — what's the email about?</label>
+                <UTextarea v-model="selected.assets.emailBriefing.brief" :rows="2" placeholder="e.g. Launch announcement to OEM accounts" class="w-full" @update:model-value="onChange" />
+              </div>
+              <FileUpload v-model="selected.assets.emailBriefing.briefingDoc" @update:model-value="onChange" />
+            </AssetCard>
+
+            <!-- Landing pages -->
+            <AssetCard
+              label="Landing pages"
+              :selected="selected.assets.landingPages.selected"
+              :complete="assetComplete('landingPages', selected.assets)"
+              @update:selected="(v) => { selected!.assets.landingPages.selected = v; onChange() }"
+            >
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Page goal / desired action</label>
+                <UInput v-model="selected.assets.landingPages.brief" placeholder="e.g. Drive demo sign-ups" class="w-full" @update:model-value="onChange" />
+              </div>
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Reference URL (optional)</label>
+                <UInput v-model="selected.assets.landingPages.reference" placeholder="henkel.com/lp" class="w-full" @update:model-value="onChange" />
+              </div>
+              <FileUpload v-model="selected.assets.landingPages.briefingDoc" @update:model-value="onChange" />
+            </AssetCard>
+
+            <!-- Forms -->
+            <AssetCard
+              label="Forms"
+              :selected="selected.assets.forms.selected"
+              :complete="assetComplete('forms', selected.assets)"
+              @update:selected="(v) => { selected!.assets.forms.selected = v; onChange() }"
+            >
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">What should the form capture?</label>
+                <UTextarea v-model="selected.assets.forms.brief" :rows="2" placeholder="e.g. Name, company, application & volume" class="w-full" @update:model-value="onChange" />
+              </div>
+              <FileUpload v-model="selected.assets.forms.briefingDoc" @update:model-value="onChange" />
+            </AssetCard>
+
+            <!-- Tracking pixels -->
+            <AssetCard
+              label="Tracking pixels"
+              :selected="selected.assets.trackingPixels.selected"
+              :complete="assetComplete('trackingPixels', selected.assets)"
+              @update:selected="(v) => { selected!.assets.trackingPixels.selected = v; onChange() }"
+            >
+              <p class="text-xs text-gray-400">Placeholder fields — to be finalised later (TBD).</p>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="mb-1 block text-[13px] font-medium text-gray-500">Provider</label>
+                  <UInput v-model="selected.assets.trackingPixels.provider" placeholder="e.g. GA4" class="w-full" @update:model-value="onChange" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel ID</label>
+                  <UInput v-model="selected.assets.trackingPixels.pixelId" placeholder="G-XXXX1234" class="w-full" @update:model-value="onChange" />
+                </div>
+              </div>
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Events to track</label>
+                <UInput v-model="selected.assets.trackingPixels.events" placeholder="page_view, sign_up" class="w-full" @update:model-value="onChange" />
+              </div>
+            </AssetCard>
+
+            <!-- Localization -->
+            <AssetCard
+              label="Localization"
+              :selected="selected.assets.localization.selected"
+              :complete="assetComplete('localization', selected.assets)"
+              @update:selected="(v) => { selected!.assets.localization.selected = v; onChange() }"
+            >
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Languages</label>
+                <TagMultiSelect v-model="selected.assets.localization.languages" :options="LANGUAGE_OPTIONS" placeholder="Add languages" @update:model-value="onChange" />
+              </div>
+            </AssetCard>
           </div>
         </section>
 
         <!-- Notes -->
         <section class="flex flex-col gap-2">
-          <h3 class="text-sm font-semibold text-gray-900">Notes</h3>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notes</h3>
           <UTextarea v-model="selected.notes" :rows="2" placeholder="Optional notes" class="w-full" />
         </section>
       </div>

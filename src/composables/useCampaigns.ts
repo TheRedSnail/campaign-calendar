@@ -1,6 +1,6 @@
 import { computed, reactive, toRefs } from 'vue'
 import type { Campaign, CampaignStatus } from '../types'
-import { seedCampaigns } from '../data/campaigns'
+import { emptyAssets, seedCampaigns } from '../data/campaigns'
 import { computeSections } from './useCompletion'
 
 export type ViewMode = 'month' | 'timeline'
@@ -97,13 +97,7 @@ function newCampaign() {
     owner: '',
     ownerEmail: '',
     notes: '',
-    assets: {
-      emailBriefing: false,
-      landingPages: false,
-      forms: false,
-      trackingPixels: false,
-      translations: false,
-    },
+    assets: emptyAssets(),
     recipients: [],
   }
   state.campaigns.push(blank)

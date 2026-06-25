@@ -7,13 +7,37 @@ export type CampaignStatus =
 
 export type Brand = 'Loctite' | 'Technomelt' | 'Teroson' | 'Bonderite'
 
-export interface CampaignAssets {
-  emailBriefing: boolean
-  landingPages: boolean
-  forms: boolean
-  trackingPixels: boolean
-  translations: boolean
+/** Email briefing, Landing pages, Forms — a question + an uploaded briefing doc. */
+export interface BriefingAsset {
+  selected: boolean
+  brief: string
+  reference?: string // optional, e.g. a landing-page reference URL
+  briefingDoc: string // uploaded file name ('' = none; mock — no real upload)
 }
+
+/** Tracking pixel — placeholder text boxes (exact fields TBD). */
+export interface TrackingAsset {
+  selected: boolean
+  provider: string
+  pixelId: string
+  events: string
+}
+
+/** Localization — add the languages the campaign needs. */
+export interface LocalizationAsset {
+  selected: boolean
+  languages: string[]
+}
+
+export interface CampaignAssets {
+  emailBriefing: BriefingAsset
+  landingPages: BriefingAsset
+  forms: BriefingAsset
+  trackingPixels: TrackingAsset
+  localization: LocalizationAsset
+}
+
+export type AssetKey = keyof CampaignAssets
 
 export interface Recipient {
   name: string
