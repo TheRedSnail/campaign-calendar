@@ -9,9 +9,6 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const DEFAULT_SECRET = "henkel-devops-webhook-2026";
 const SECRET = Deno.env.get("DEVOPS_WEBHOOK_SECRET") ?? DEFAULT_SECRET;
 
-// Work item types that represent a whole campaign (vs. a per-team ticket).
-const CAMPAIGN_WORKITEM_TYPES = ["CMPG", "Feature", "Epic"];
-
 // Azure DevOps System.State -> our TicketStage. Devs confirm their exact state names.
 const STATE_TO_STAGE: Record<string, string> = {
   "new": "Briefed", "to do": "Briefed", "proposed": "Briefed", "open": "Briefed",
@@ -79,7 +76,6 @@ Deno.serve(async (req) => {
   const workItemId: number | null = resource.workItemId ?? resource.id ?? null;
   const workItemType: string | undefined = revFields["System.WorkItemType"];
   const state: string | undefined = revFields["System.State"] ?? changed?.["System.State"]?.newValue;
-  const title: string | undefined = revFields["System.Title"];
   const assignee = cleanName(revFields["System.AssignedTo"] ?? revFields["System.ChangedBy"]);
   const dueDate = fmtDate(revFields["Microsoft.VSTS.Scheduling.TargetDate"]);
   const wiUrl: string | undefined = resource?._links?.html?.href ?? resource?.url;
@@ -92,33 +88,29 @@ Deno.serve(async (req) => {
   try {
     if (workItemId == null) {
       note = "no workItemId";
-    } else if (workItemType && CAMPAIGN_WORKITEM_TYPES.includes(workItemType)) {
-      // Campaign-level: match by devops_id, else by title (first contact), then store the id.
-      let { data: camp } = await admin.from("campaigns").select("id").eq("devops_id", workItemId).maybeSingle();
-      if (!camp && title) {
-        ({ data: camp } = await admin.from("campaigns").select("id").ilike("name", title).maybeSingle());
-      }
+    } else {
+      // Match purely on the DevOps work item id — DevOps is the master of record, and names
+      // are not unique. A campaign carries its parent (CMPG) id; tickets carry their child ids.
+      // (These ids are populated by outbound creation at the briefing moment.)
+      const { data: camp } = await admin.from("campaigns").select("id").eq("devops_id", workItemId).maybeSingle();
       if (camp) {
         await admin.from("campaigns").update({
-          devops_id: workItemId, devops_state: state ?? null, devops_url: wiUrl ?? null, synced_at: now,
+          devops_state: state ?? null, devops_url: wiUrl ?? null, synced_at: now,
         }).eq("id", camp.id);
         matched = true; target = "campaign";
       } else {
-        note = "no matching campaign (by devops_id or title)";
-      }
-    } else {
-      // Ticket-level: match by devops_id (set at creation / backfill).
-      const { data: tk } = await admin.from("devops_tickets").select("id").eq("devops_id", workItemId).maybeSingle();
-      if (tk) {
-        const stage = mapStage(state);
-        const patch: Record<string, unknown> = { devops_state: state ?? null, devops_url: wiUrl ?? null, synced_at: now };
-        if (stage) { patch.stage = stage; if (stage === "Live") patch.sla = "On track"; }
-        if (assignee) patch.assignee = assignee;
-        if (dueDate) patch.due_date = dueDate;
-        await admin.from("devops_tickets").update(patch).eq("id", tk.id);
-        matched = true; target = "ticket";
-      } else {
-        note = "no matching ticket (set devops_id to link)";
+        const { data: tk } = await admin.from("devops_tickets").select("id").eq("devops_id", workItemId).maybeSingle();
+        if (tk) {
+          const stage = mapStage(state);
+          const patch: Record<string, unknown> = { devops_state: state ?? null, devops_url: wiUrl ?? null, synced_at: now };
+          if (stage) { patch.stage = stage; if (stage === "Live") patch.sla = "On track"; }
+          if (assignee) patch.assignee = assignee;
+          if (dueDate) patch.due_date = dueDate;
+          await admin.from("devops_tickets").update(patch).eq("id", tk.id);
+          matched = true; target = "ticket";
+        } else {
+          note = `no campaign or ticket linked to work item ${workItemId}`;
+        }
       }
     }
   } catch (e) {

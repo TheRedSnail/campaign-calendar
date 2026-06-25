@@ -58,14 +58,18 @@ one row per work item, upserted to its latest event/state, rather than an append
   `?token=<secret>` to the URL (also accepts `X-Webhook-Secret` / `Bearer`). The secret is the
   `DEVOPS_WEBHOOK_SECRET` function secret — set it with
   `supabase secrets set DEVOPS_WEBHOOK_SECRET=…` (a prototype default is baked in until you do).
-- **Linkage**: once linked we match on `resource.workItemId`. On first contact a campaign is matched
-  by `System.Title`; per-team tickets are matched by a pre-set `devops_id` (populated when outbound
-  creation is added later, or back-filled). Unmatched events are still logged (`matched=false`).
+- **Linkage**: matching is purely on `resource.workItemId` (DevOps is the master of record; names
+  are not unique, so there is no name check). A campaign stores its parent (CMPG) work item id in
+  `campaigns.devops_id`; each per-team ticket stores its child work item id in
+  `devops_tickets.devops_id`. These ids are written by **outbound** creation at the briefing moment
+  (to be built); after that every update matches by id. Events for ids we don't yet know are still
+  logged (`matched=false`).
 - **Confirm**: the exact `System.State` values your process uses, so `STATE_TO_STAGE` in the
   function is accurate (defaults cover New/To do, Active/Doing, Resolved/In review, Done/Closed).
 
-Verified end-to-end with the team's sample payload (`payload-example.txt` at the repo root): a
-`CMPG` event updates the matched campaign, and a child-type event maps to a ticket's stage.
+Verified end-to-end with the team's sample payload (`payload-example.txt` at the repo root): an
+event whose `workItemId` is linked to a row updates it — a campaign's synced state, or a ticket's
+`stage` (e.g. `Doing` → `In progress`) with assignee/due date.
 
 ## Working locally
 
