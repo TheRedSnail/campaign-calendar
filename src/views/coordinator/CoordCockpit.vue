@@ -3,11 +3,12 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCampaigns } from '../../composables/useCampaigns'
 import { useCoordinator, ASSIGNEE_OPTIONS } from '../../composables/useCoordinator'
-import { TICKET_STAGES, SLA_LIST, STAGE_DOT, fmtDate } from '../../data/coordinator'
+import { TICKET_STAGES, SLA_LIST, fmtDate } from '../../data/coordinator'
 import { TODAY } from '../../data/options'
 import type { TicketSla, TicketStage } from '../../types'
 import KpiCard from '../../components/KpiCard.vue'
 import StatusBadge from '../../components/StatusBadge.vue'
+import StageStepper from '../../components/StageStepper.vue'
 
 const route = useRoute()
 const { campaigns } = useCampaigns()
@@ -23,13 +24,6 @@ const {
 const campaign = computed(() => campaigns.value.find((c) => c.id === route.params.id))
 const tickets = computed(() => (campaign.value ? ticketsFor(campaign.value.id) : []))
 
-const DOT_CLASS: Record<string, string> = {
-  gray: 'bg-gray-300',
-  blue: 'bg-blue-600',
-  amber: 'bg-amber-500',
-  green: 'bg-green-600',
-}
-
 const onTrack = computed(() => tickets.value.filter((t) => t.sla === 'On track').length)
 
 const goLiveDays = computed(() => {
@@ -40,12 +34,14 @@ const goLiveDays = computed(() => {
   return d >= 0 ? `${d} days` : `${-d} d ago`
 })
 
-const stepper = computed(() =>
-  TICKET_STAGES.map((s, i) => {
-    const reached = tickets.value.filter((t) => TICKET_STAGES.indexOf(t.stage) >= i).length
-    return { stage: s, dot: STAGE_DOT[s], active: reached > 0 }
-  }),
-)
+/** Representative position in the stage flow: rounded average of the
+ * campaign's ticket stages (updates live as tickets are edited). */
+const currentIndex = computed(() => {
+  if (!tickets.value.length) return 0
+  const avg =
+    tickets.value.reduce((sum, t) => sum + TICKET_STAGES.indexOf(t.stage), 0) / tickets.value.length
+  return Math.round(avg)
+})
 </script>
 
 <template>
@@ -82,12 +78,7 @@ const stepper = computed(() =>
     <!-- stepper -->
     <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
       <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-400">Campaign progress</h2>
-      <div class="flex items-start justify-between gap-2">
-        <div v-for="st in stepper" :key="st.stage" class="flex flex-1 flex-col items-center gap-1.5 text-center">
-          <span class="size-3 rounded-full" :class="st.active ? DOT_CLASS[st.dot] : 'bg-gray-200'" />
-          <span class="text-xs font-medium text-gray-700">{{ st.stage }}</span>
-        </div>
-      </div>
+      <StageStepper :stages="TICKET_STAGES" :current-index="currentIndex" />
     </div>
 
     <!-- editable tickets -->

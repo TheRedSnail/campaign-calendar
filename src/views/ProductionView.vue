@@ -2,8 +2,9 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import KpiCard from '../components/KpiCard.vue'
+import StageStepper from '../components/StageStepper.vue'
 import { useCampaigns } from '../composables/useCampaigns'
-import type { ProductionElement, ProgressDot, ElementStatus } from '../types'
+import type { ProductionElement, ElementStatus } from '../types'
 
 const route = useRoute()
 const router = useRouter()
@@ -24,12 +25,18 @@ const TODAY_IDX = 8
 const GOLIVE_IDX = 15
 const pos = (idx: number) => (idx / AXIS_MAX) * 100
 
-const DOT: Record<ProgressDot, string> = {
-  gray: 'bg-gray-400',
-  blue: 'bg-blue-600',
-  amber: 'bg-amber-500',
-  green: 'bg-green-600',
-}
+const stageLabels = computed(() => prod.value?.progressStages.map((s) => s.label) ?? [])
+
+/** Representative position of the campaign in the stage flow: the rounded
+ * average of where its elements currently sit. */
+const currentIndex = computed(() => {
+  const p = prod.value
+  if (!p || !p.elements.length) return 0
+  const order = stageLabels.value
+  const avg =
+    p.elements.reduce((sum, e) => sum + order.indexOf(e.currentStage), 0) / p.elements.length
+  return Math.round(avg)
+})
 
 const STATUS: Record<ElementStatus, { dot: string; text: string }> = {
   'On track': { dot: 'bg-green-500', text: 'text-gray-600' },
@@ -98,18 +105,7 @@ function back() {
         <!-- Campaign progress (overarching broad statuses) -->
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <p class="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress</p>
-          <div class="flex items-center">
-            <template v-for="(stage, i) in prod.progressStages" :key="stage.label">
-              <div class="flex shrink-0 items-center gap-2">
-                <span class="size-2 rounded-full" :class="DOT[stage.dot]" />
-                <span class="whitespace-nowrap text-sm font-medium text-gray-800">{{ stage.label }}</span>
-              </div>
-              <div
-                v-if="i < prod.progressStages.length - 1"
-                class="mx-1.5 h-px flex-1 bg-gray-200"
-              />
-            </template>
-          </div>
+          <StageStepper :stages="stageLabels" :current-index="currentIndex" />
         </div>
 
         <!-- Production timeline (Gantt) -->
