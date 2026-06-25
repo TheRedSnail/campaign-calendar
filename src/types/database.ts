@@ -178,35 +178,32 @@ export type Database = {
       devops_webhook_events: {
         Row: {
           event_type: string | null
-          id: string
           matched: boolean
           new_state: string | null
           payload: Json | null
           received_at: string
           target: string | null
-          work_item_id: number | null
+          work_item_id: number
           work_item_type: string | null
         }
         Insert: {
           event_type?: string | null
-          id?: string
           matched?: boolean
           new_state?: string | null
           payload?: Json | null
           received_at?: string
           target?: string | null
-          work_item_id?: number | null
+          work_item_id: number
           work_item_type?: string | null
         }
         Update: {
           event_type?: string | null
-          id?: string
           matched?: boolean
           new_state?: string | null
           payload?: Json | null
           received_at?: string
           target?: string | null
-          work_item_id?: number | null
+          work_item_id?: number
           work_item_type?: string | null
         }
         Relationships: []

@@ -125,16 +125,20 @@ Deno.serve(async (req) => {
     note = `error: ${String(e)}`;
   }
 
-  // Always record the event (audit + not-yet-linked items).
-  await admin.from("devops_webhook_events").insert({
-    event_type: body?.eventType ?? null,
-    work_item_id: workItemId,
-    work_item_type: workItemType ?? null,
-    new_state: state ?? null,
-    target,
-    matched,
-    payload: body,
-  });
+  // Record the event keyed by work item id — one row per work item, upserted to its latest
+  // state (the DevOps team asked for work_item_id as the primary key). Skip if there is no id.
+  if (workItemId != null) {
+    await admin.from("devops_webhook_events").upsert({
+      work_item_id: workItemId,
+      event_type: body?.eventType ?? null,
+      work_item_type: workItemType ?? null,
+      new_state: state ?? null,
+      target,
+      matched,
+      payload: body,
+      received_at: new Date().toISOString(),
+    }, { onConflict: "work_item_id" });
+  }
 
   return new Response(JSON.stringify({ ok: true, matched, target, note }), {
     status: 200, headers: { "Content-Type": "application/json" },

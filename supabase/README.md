@@ -42,10 +42,13 @@ Password for all: **`Demo1234!`**
 
 `functions/devops-webhook/` is the endpoint the team's Azure DevOps **service hook** POSTs to when a
 work item changes. Their `CMPG` work item maps to our **campaign**; child work items map to our
-**`devops_tickets`**. The function logs every event to `devops_webhook_events`, then updates the
+**`devops_tickets`**. The function records each event in `devops_webhook_events`, then updates the
 matched row (`devops_state`, `devops_url`, `synced_at`; tickets also map `System.State` → our
 `stage`). It writes via the service-role key (bypasses RLS) and always returns `200` on an
 authenticated, well-formed request.
+
+`devops_webhook_events` is **keyed by the work item id** (its primary key, per the DevOps team) —
+one row per work item, upserted to its latest event/state, rather than an append-only log.
 
 **Give the developers:**
 
