@@ -1,5 +1,12 @@
 import './assets/css/main.css'
 
+import { addCollection } from '@iconify/vue'
+import lucideIcons from '@iconify-json/lucide/icons.json'
+// Register Lucide offline so icons render without the Iconify API — the
+// production CSP blocks external fetches (see netlify.toml / DESIGN.md).
+// Covers both our `i-lucide-*` icons and Nuxt UI's internal defaults.
+addCollection(lucideIcons)
+
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import ui from '@nuxt/ui/vue-plugin'
