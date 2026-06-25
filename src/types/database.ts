@@ -29,6 +29,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           cta: string
+          devops_id: number | null
+          devops_state: string | null
+          devops_url: string | null
           end_date: string | null
           go_live_date: string | null
           goal: string
@@ -45,6 +48,7 @@ export type Database = {
           sbu: string
           start_date: string | null
           status: Database["public"]["Enums"]["campaign_status"]
+          synced_at: string | null
         }
         Insert: {
           assets?: Json
@@ -60,6 +64,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           cta?: string
+          devops_id?: number | null
+          devops_state?: string | null
+          devops_url?: string | null
           end_date?: string | null
           go_live_date?: string | null
           goal?: string
@@ -76,6 +83,7 @@ export type Database = {
           sbu?: string
           start_date?: string | null
           status?: Database["public"]["Enums"]["campaign_status"]
+          synced_at?: string | null
         }
         Update: {
           assets?: Json
@@ -91,6 +99,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           cta?: string
+          devops_id?: number | null
+          devops_state?: string | null
+          devops_url?: string | null
           end_date?: string | null
           go_live_date?: string | null
           goal?: string
@@ -107,6 +118,7 @@ export type Database = {
           sbu?: string
           start_date?: string | null
           status?: Database["public"]["Enums"]["campaign_status"]
+          synced_at?: string | null
         }
         Relationships: []
       }
@@ -114,30 +126,42 @@ export type Database = {
         Row: {
           assignee: string
           campaign_id: string
+          devops_id: number | null
+          devops_state: string | null
+          devops_url: string | null
           due_date: string
           id: string
           sla: string
           stage: string
+          synced_at: string | null
           team: string
           title: string
         }
         Insert: {
           assignee?: string
           campaign_id: string
+          devops_id?: number | null
+          devops_state?: string | null
+          devops_url?: string | null
           due_date?: string
           id: string
           sla?: string
           stage?: string
+          synced_at?: string | null
           team: string
           title?: string
         }
         Update: {
           assignee?: string
           campaign_id?: string
+          devops_id?: number | null
+          devops_state?: string | null
+          devops_url?: string | null
           due_date?: string
           id?: string
           sla?: string
           stage?: string
+          synced_at?: string | null
           team?: string
           title?: string
         }
@@ -150,6 +174,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      devops_webhook_events: {
+        Row: {
+          event_type: string | null
+          id: string
+          matched: boolean
+          new_state: string | null
+          payload: Json | null
+          received_at: string
+          target: string | null
+          work_item_id: number | null
+          work_item_type: string | null
+        }
+        Insert: {
+          event_type?: string | null
+          id?: string
+          matched?: boolean
+          new_state?: string | null
+          payload?: Json | null
+          received_at?: string
+          target?: string | null
+          work_item_id?: number | null
+          work_item_type?: string | null
+        }
+        Update: {
+          event_type?: string | null
+          id?: string
+          matched?: boolean
+          new_state?: string | null
+          payload?: Json | null
+          received_at?: string
+          target?: string | null
+          work_item_id?: number | null
+          work_item_type?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

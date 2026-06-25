@@ -38,6 +38,32 @@ region eu-west-3). Auth, the Postgres schema, Row-Level Security, and an admin E
 
 Password for all: **`Demo1234!`**
 
+## Azure DevOps writeback (inbound)
+
+`functions/devops-webhook/` is the endpoint the team's Azure DevOps **service hook** POSTs to when a
+work item changes. Their `CMPG` work item maps to our **campaign**; child work items map to our
+**`devops_tickets`**. The function logs every event to `devops_webhook_events`, then updates the
+matched row (`devops_state`, `devops_url`, `synced_at`; tickets also map `System.State` → our
+`stage`). It writes via the service-role key (bypasses RLS) and always returns `200` on an
+authenticated, well-formed request.
+
+**Give the developers:**
+
+- **URL**: `https://hvzrhyitjapnxrzilzoq.supabase.co/functions/v1/devops-webhook`
+- **Events**: `workitem.created`, `workitem.updated`.
+- **Auth**: set a shared secret as the service hook's HTTP **Basic auth** password, or append
+  `?token=<secret>` to the URL (also accepts `X-Webhook-Secret` / `Bearer`). The secret is the
+  `DEVOPS_WEBHOOK_SECRET` function secret — set it with
+  `supabase secrets set DEVOPS_WEBHOOK_SECRET=…` (a prototype default is baked in until you do).
+- **Linkage**: once linked we match on `resource.workItemId`. On first contact a campaign is matched
+  by `System.Title`; per-team tickets are matched by a pre-set `devops_id` (populated when outbound
+  creation is added later, or back-filled). Unmatched events are still logged (`matched=false`).
+- **Confirm**: the exact `System.State` values your process uses, so `STATE_TO_STAGE` in the
+  function is accurate (defaults cover New/To do, Active/Doing, Resolved/In review, Done/Closed).
+
+Verified end-to-end with the team's sample payload (`payload-example.txt` at the repo root): a
+`CMPG` event updates the matched campaign, and a child-type event maps to a ticket's stage.
+
 ## Working locally
 
 ```bash

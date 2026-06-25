@@ -65,6 +65,7 @@ const SLA_ACCENT: Record<TicketSla, string> = {
             <th class="px-4 py-3 font-semibold">SLA</th>
             <th class="px-4 py-3 font-semibold">Assignee</th>
             <th class="px-4 py-3 font-semibold">Due</th>
+            <th class="px-4 py-3 font-semibold">DevOps</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -107,9 +108,23 @@ const SLA_ACCENT: Record<TicketSla, string> = {
               />
             </td>
             <td class="px-4 py-3 text-gray-700">{{ t.dueDate }}</td>
+            <td class="px-4 py-3">
+              <a
+                v-if="t.devopsUrl"
+                :href="t.devopsUrl"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                :title="`Synced from Azure DevOps${t.devopsState ? ' · ' + t.devopsState : ''}`"
+              >
+                <UIcon name="i-lucide-git-pull-request-arrow" class="size-3.5" />
+                {{ t.devopsState || 'View' }}
+              </a>
+              <span v-else class="text-xs text-gray-300">—</span>
+            </td>
           </tr>
           <tr v-if="!rows.length">
-            <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-400">No tickets match this filter.</td>
+            <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-400">No tickets match this filter.</td>
           </tr>
         </tbody>
       </table>

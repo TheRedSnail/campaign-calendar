@@ -42,6 +42,9 @@ export function rowToCampaign(row: CampaignRow): Campaign {
     briefedAt: row.briefed_at ?? undefined,
     briefedDate: row.briefed_date ?? undefined,
     goLiveDate: row.go_live_date ?? undefined,
+    devopsId: row.devops_id ?? undefined,
+    devopsState: row.devops_state ?? undefined,
+    devopsUrl: row.devops_url ?? undefined,
   }
 }
 
@@ -89,6 +92,9 @@ export function rowToTicket(row: TicketRow): DevOpsTicket {
     sla: row.sla as TicketSla,
     assignee: str(row.assignee),
     dueDate: str(row.due_date),
+    devopsId: row.devops_id ?? undefined,
+    devopsState: row.devops_state ?? undefined,
+    devopsUrl: row.devops_url ?? undefined,
   }
 }
 

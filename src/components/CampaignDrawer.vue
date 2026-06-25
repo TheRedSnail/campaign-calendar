@@ -99,6 +99,19 @@ const check = 'i-lucide-check'
 
     <template #body>
       <div v-if="selected" class="flex flex-col gap-7 pb-4">
+        <!-- Synced state from Azure DevOps (read-only writeback) -->
+        <a
+          v-if="selected.devopsUrl"
+          :href="selected.devopsUrl"
+          target="_blank"
+          rel="noopener"
+          class="-mb-3 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-100"
+        >
+          <UIcon name="i-lucide-git-pull-request-arrow" class="size-4" />
+          Synced from Azure DevOps<span v-if="selected.devopsState">: {{ selected.devopsState }}</span>
+          <UIcon name="i-lucide-external-link" class="size-3.5" />
+        </a>
+
         <!-- Basics -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">

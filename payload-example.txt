@@ -1,0 +1,209 @@
+{
+  "subscriptionId": "54011009-2c8d-4da3-81ad-8b754d41a164",
+  "notificationId": 6,
+  "id": "62b80766-cc5d-4769-b220-797453565658",
+  "eventType": "workitem.updated",
+  "publisherId": "tfs",
+  "message": {
+    "text": "CMPG #727367 (Grepovicka sales boost) transitioned to Doing by Marek Jankovic\r\n(https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367)",
+    "html": "<a href=\"https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367\%22>CMPG #727367</a> (Grepovicka sales boost) transitioned to Doing by Marek Jankovic",
+    "markdown": "[CMPG #727367](https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367) (Grepovicka sales boost) transitioned to Doing by Marek Jankovic"
+  },
+  "detailedMessage": {
+    "text": "CMPG #727367 (Grepovicka sales boost) transitioned to Doing by Marek Jankovic\r\n(https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367)\r\n\r\n- New State: Doing\r\n",
+    "html": "<a href=\"https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367\%22>CMPG #727367</a> (Grepovicka sales boost) transitioned to Doing by Marek Jankovic<ul>\r\n<li>New State: Doing</li></ul>",
+    "markdown": "[CMPG #727367](https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367) (Grepovicka sales boost) transitioned to Doing by Marek Jankovic\r\n\r\n* New State: Doing\r\n"
+  },
+  "resource": {
+    "id": 11,
+    "workItemId": 727367,
+    "rev": 7,
+    "revisedBy": {
+      "id": "b5809382-0510-6407-a93f-88565446cc4e",
+      "name": "Marek Jankovic <marek.jankovic@henkel.com>",
+      "displayName": "Marek Jankovic",
+      "url": "https://spsprodweu4.vssps.visualstudio.com/Af96b30fe-e99b-42ae-b76f-b682231e927a/_apis/Identities/b5809382-0510-6407-a93f-88565446cc4e%22,
+      "_links": {
+        "avatar": {
+          "href": "https://dev.azure.com/henkeldx/_apis/GraphProfile/MemberAvatars/aad.YjU4MDkzODItMDUxMC03NDA3LWE5M2YtODg1NjU0NDZjYzRl%22
+        }
+      },
+      "uniqueName": "marek.jankovic@henkel.com",
+      "imageUrl": "https://dev.azure.com/henkeldx/_apis/GraphProfile/MemberAvatars/aad.YjU4MDkzODItMDUxMC03NDA3LWE5M2YtODg1NjU0NDZjYzRl%22,
+      "descriptor": "aad.YjU4MDkzODItMDUxMC03NDA3LWE5M2YtODg1NjU0NDZjYzRl"
+    },
+    "revisedDate": "9999-01-01T00:00:00Z",
+    "fields": {
+      "System.Rev": {
+        "oldValue": 6,
+        "newValue": 7
+      },
+      "System.AuthorizedDate": {
+        "oldValue": "2026-06-25T14:07:31.16Z",
+        "newValue": "2026-06-25T14:09:55.683Z"
+      },
+      "System.RevisedDate": {
+        "oldValue": "2026-06-25T14:09:55.683Z",
+        "newValue": "9999-01-01T00:00:00Z"
+      },
+      "System.State": {
+        "oldValue": "To do",
+        "newValue": "Doing"
+      },
+      "System.Reason": {
+        "oldValue": "Moved to state To do",
+        "newValue": "Moved to state Doing"
+      },
+      "System.ChangedDate": {
+        "oldValue": "2026-06-25T14:07:31.16Z",
+        "newValue": "2026-06-25T14:09:55.683Z"
+      },
+      "System.Watermark": {
+        "oldValue": 5640407,
+        "newValue": 5640416
+      },
+      "System.BoardColumn": {
+        "oldValue": "Open"
+      },
+      "Microsoft.VSTS.Common.StateChangeDate": {
+        "oldValue": "2026-06-25T11:34:31.16Z",
+        "newValue": "2026-06-25T14:09:55.683Z"
+      },
+      "Microsoft.VSTS.Common.ActivatedDate": {
+        "newValue": "2026-06-25T14:09:55.683Z"
+      },
+      "Microsoft.VSTS.Common.ActivatedBy": {
+        "newValue": "Marek Jankovic <marek.jankovic@henkel.com>"
+      },
+      "Custom.Prioritystring": {
+        "newValue": "Major"
+      },
+      "WEF_DFB3C9328F8941DD83E1E4C3FB39E405_Kanban.Column": {
+        "oldValue": "Open"
+      }
+    },
+    "_links": {
+      "self": {
+        "href": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367/updates/11%22
+      },
+      "workItemUpdates": {
+        "href": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367/updates/11%22
+      },
+      "parent": {
+        "href": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367"
+      },
+      "html": {
+        "href": "https://dev.azure.com/henkeldx/web/wi.aspx?pcguid=b080c9d9-526a-43c7-b689-fce2d8c7d2db&id=727367"
+      }
+    },
+    "url": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367/updates/11%22,
+    "revision": {
+      "id": 727367,
+      "rev": 7,
+      "fields": {
+        "System.AreaPath": "Webstudio Bratislava\\Coordinators",
+        "System.TeamProject": "Webstudio Bratislava",
+        "System.IterationPath": "Webstudio Bratislava",
+        "System.WorkItemType": "CMPG",
+        "System.State": "Doing",
+        "System.Reason": "Moved to state Doing",
+        "System.CreatedDate": "2026-06-25T11:34:31.16Z",
+        "System.CreatedBy": "Marek Jankovic <marek.jankovic@henkel.com>",
+        "System.ChangedDate": "2026-06-25T14:09:55.683Z",
+        "System.ChangedBy": "Marek Jankovic <marek.jankovic@henkel.com>",
+        "System.CommentCount": 0,
+        "System.Title": "Grepovicka sales boost",
+        "System.BoardColumnDone": false,
+        "Microsoft.VSTS.Common.StateChangeDate": "2026-06-25T14:09:55.683Z",
+        "Microsoft.VSTS.Common.ActivatedDate": "2026-06-25T14:09:55.683Z",
+        "Microsoft.VSTS.Common.ActivatedBy": "Marek Jankovic <marek.jankovic@henkel.com>",
+        "Microsoft.VSTS.Scheduling.TargetDate": "2026-07-30T22:00:00Z",
+        "Microsoft.VSTS.Scheduling.StartDate": "2026-06-29T22:00:00Z",
+        "WEF_1431210A312343A9B9D7C2B014445279_Kanban.Column": "⚒️ Open",
+        "WEF_1431210A312343A9B9D7C2B014445279_Kanban.Column.Done": false,
+        "Custom.Prioritystring": "Major",
+        "Custom.Country": "SK, NL",
+        "Custom.Primarycontact": "marek.jankovic@henkel.com",
+        "Custom.SBU": "AQC",
+        "WEF_DFB3C9328F8941DD83E1E4C3FB39E405_Kanban.Column.Done": false,
+        "Custom.WebsiteorBrand": "Metylan",
+        "Custom.Language": "Slovak",
+        "Custom.CostCenter": "42666",
+        "Custom.Campaigntype": "Event",
+        "Custom.Channels": "Youtube",
+        "Custom.Campaignemail": true,
+        "Custom.Campaignforms": false,
+        "Custom.Campaigntranslations": true,
+        "Custom.Campaignwebsite": true,
+        "Custom.Campaigntracking": true,
+        "System.Description": "<p class=editor-paragraph>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin dignissim nunc in orci blandit sollicitudin. Praesent a egestas eros. Suspendisse interdum ligula at eros blandit, et fermentum felis interdum. Etiam scelerisque, sem eu consectetur gravida, magna nulla cursus risus, mollis ultrices mi neque quis metus. Proin posuere neque id enim dignissim elementum. Nullam eleifend, purus in fringilla cursus, nunc quam blandit tellus, vitae consectetur ipsum nisl a dolor. Sed facilisis dolor vel finibus ultricies. Aliquam erat volutpat. Sed non congue turpis. Duis ultrices libero ligula, gravida cursus risus consequat sed. Fusce vehicula lectus ac fermentum iaculis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque porta id massa sed dignissim. Nunc placerat cursus commodo. </p>",
+        "System.Tags": "campaign; CheckMyTicket"
+      },
+      "multilineFieldsFormat": {
+        "System.Description": "html"
+      },
+      "relations": [
+        {
+          "rel": "System.LinkTypes.Hierarchy-Forward",
+          "url": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727369",
+          "attributes": {
+            "isLocked": false,
+            "name": "Child"
+          }
+        },
+        {
+          "rel": "System.LinkTypes.Hierarchy-Forward",
+          "url": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727368",
+          "attributes": {
+            "isLocked": false,
+            "name": "Child"
+          }
+        },
+        {
+          "rel": "System.LinkTypes.Hierarchy-Forward",
+          "url": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727371",
+          "attributes": {
+            "isLocked": false,
+            "name": "Child"
+          }
+        },
+        {
+          "rel": "System.LinkTypes.Hierarchy-Forward",
+          "url": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727370",
+          "attributes": {
+            "isLocked": false,
+            "name": "Child"
+          }
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367/revisions/7%22
+        },
+        "workItemRevisions": {
+          "href": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367/revisions/7%22
+        },
+        "parent": {
+          "href": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367"
+        }
+      },
+      "url": "https://dev.azure.com/henkeldx/74842c84-a3ec-4c8a-b698-6d1847bc5ecb/_apis/wit/workItems/727367/revisions/7%22
+    }
+  },
+  "resourceVersion": "1.0",
+  "resourceContainers": {
+    "collection": {
+      "id": "b080c9d9-526a-43c7-b689-fce2d8c7d2db",
+      "baseUrl": "https://dev.azure.com/henkeldx/"
+    },
+    "account": {
+      "id": "f96b30fe-e99b-42ae-b76f-b682231e927a",
+      "baseUrl": "https://dev.azure.com/henkeldx/"
+    },
+    "project": {
+      "id": "74842c84-a3ec-4c8a-b698-6d1847bc5ecb",
+      "baseUrl": "https://dev.azure.com/henkeldx/"
+    }
+  },
+  "createdDate": "2026-06-25T14:10:02.2571528Z"
+}

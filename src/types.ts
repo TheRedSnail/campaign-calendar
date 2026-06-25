@@ -66,6 +66,10 @@ export interface DevOpsTicket {
   sla: TicketSla
   assignee: string
   dueDate: string // display string, e.g. '08 Jul'
+  /** Last state synced FROM Azure DevOps (read-only writeback; see supabase/functions/devops-webhook). */
+  devopsId?: number
+  devopsState?: string
+  devopsUrl?: string
 }
 
 export interface Campaign {
@@ -113,4 +117,9 @@ export interface Campaign {
    *  Drives both the production-Gantt axis and the coordinator go-live math. */
   briefedDate?: string
   goLiveDate?: string
+
+  /** Last state synced FROM Azure DevOps for this campaign's CMPG work item (read-only). */
+  devopsId?: number
+  devopsState?: string
+  devopsUrl?: string
 }
