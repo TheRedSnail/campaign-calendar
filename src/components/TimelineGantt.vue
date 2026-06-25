@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCampaigns } from '../composables/useCampaigns'
+import { useCoordinator } from '../composables/useCoordinator'
 import { BRAND_OPTIONS, STATUS_META, TODAY } from '../data/options'
 import { buildTimelineWeeks, shortDate, timelineBar, timelineFraction } from '../utils/dates'
 import type { Brand, Campaign } from '../types'
 
 const { filtered, openDrawer } = useCampaigns()
+const { campaignProgress } = useCoordinator()
+
+/** In-flight campaigns show live ticket-derived progress; others use brief completion. */
+const displayProgress = (c: Campaign) =>
+  c.status === 'in_production' ? campaignProgress(c) : c.progress
 
 const ROW = 48 // px per campaign bar row
 const weeks = buildTimelineWeeks()
@@ -91,7 +97,7 @@ function barStyle(c: Campaign) {
               >
                 <span class="truncate">{{ c.name }}</span>
                 <span class="shrink-0 rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-semibold leading-none">
-                  {{ c.progress }}%
+                  {{ displayProgress(c) }}%
                 </span>
               </button>
             </div>

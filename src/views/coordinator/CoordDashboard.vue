@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useCoordinator } from '../../composables/useCoordinator'
 import { computeSections } from '../../composables/useCompletion'
 import { fmtDate } from '../../data/coordinator'
+import { CURRENT_USER } from '../../data/options'
 import KpiCard from '../../components/KpiCard.vue'
 import MiniStepper from '../../components/coordinator/MiniStepper.vue'
 import SlaBadge from '../../components/coordinator/SlaBadge.vue'
@@ -51,7 +52,7 @@ const riskRows = computed(() =>
   <div class="mx-auto max-w-[1440px] space-y-5 p-6">
     <!-- greeting -->
     <div>
-      <h1 class="text-2xl font-semibold text-gray-900">Good morning, Jan</h1>
+      <h1 class="text-2xl font-semibold text-gray-900">Good morning, {{ CURRENT_USER.firstName }}</h1>
       <p class="mt-1 text-sm text-gray-500">
         {{ kpi.inFlight }} campaigns in flight · {{ kpi.briefsToAction }} briefs waiting on you ·
         {{ kpi.atRisk }} elements at risk

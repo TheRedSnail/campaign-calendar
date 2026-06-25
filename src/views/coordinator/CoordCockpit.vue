@@ -5,6 +5,7 @@ import { useCampaigns } from '../../composables/useCampaigns'
 import { useCoordinator, ASSIGNEE_OPTIONS } from '../../composables/useCoordinator'
 import { TICKET_STAGES, SLA_LIST, fmtDate } from '../../data/coordinator'
 import { TODAY } from '../../data/options'
+import { businessDaysBetween } from '../../utils/production'
 import type { TicketSla, TicketStage } from '../../types'
 import KpiCard from '../../components/KpiCard.vue'
 import StatusBadge from '../../components/StatusBadge.vue'
@@ -14,6 +15,7 @@ const route = useRoute()
 const { campaigns } = useCampaigns()
 const {
   ticketsFor,
+  campaignStageIndex,
   campaignProgress,
   campaignSla,
   setTicketStage,
@@ -23,25 +25,19 @@ const {
 
 const campaign = computed(() => campaigns.value.find((c) => c.id === route.params.id))
 const tickets = computed(() => (campaign.value ? ticketsFor(campaign.value.id) : []))
+const goLive = computed(() => campaign.value?.goLiveDate ?? campaign.value?.endDate ?? '')
 
 const onTrack = computed(() => tickets.value.filter((t) => t.sla === 'On track').length)
 
+// Working (business) days to go-live — same measure as the production timeline axis.
 const goLiveDays = computed(() => {
-  if (!campaign.value) return '—'
-  const d = Math.round(
-    (new Date(campaign.value.endDate + 'T00:00:00').getTime() - new Date(TODAY + 'T00:00:00').getTime()) / 86_400_000,
-  )
-  return d >= 0 ? `${d} days` : `${-d} d ago`
+  if (!goLive.value) return '—'
+  if (goLive.value < TODAY) return 'overdue'
+  return `${businessDaysBetween(TODAY, goLive.value)} days`
 })
 
-/** Representative position in the stage flow: rounded average of the
- * campaign's ticket stages (updates live as tickets are edited). */
-const currentIndex = computed(() => {
-  if (!tickets.value.length) return 0
-  const avg =
-    tickets.value.reduce((sum, t) => sum + TICKET_STAGES.indexOf(t.stage), 0) / tickets.value.length
-  return Math.round(avg)
-})
+/** Campaign-level stage position — the single shared rule (updates live as tickets are edited). */
+const currentIndex = computed(() => (campaign.value ? campaignStageIndex(campaign.value) : 0))
 </script>
 
 <template>
@@ -59,7 +55,7 @@ const currentIndex = computed(() => {
         </p>
       </div>
       <RouterLink
-        v-if="campaign.production"
+        v-if="tickets.length"
         :to="`/campaign/${campaign.id}/production`"
         class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
       >
@@ -72,7 +68,7 @@ const currentIndex = computed(() => {
       <KpiCard label="Overall progress" :value="`${campaignProgress(campaign)}%`" :progress="campaignProgress(campaign)" />
       <KpiCard label="SLA" :value="`${onTrack} / ${tickets.length}`" caption="tickets on track" />
       <KpiCard label="Work items" :value="String(tickets.length)" caption="across operational teams" />
-      <KpiCard label="Time to go-live" :value="goLiveDays" :caption="`go-live ${fmtDate(campaign.endDate)}`" />
+      <KpiCard label="Time to go-live" :value="goLiveDays" :caption="`go-live ${fmtDate(goLive)}`" />
     </div>
 
     <!-- stepper -->

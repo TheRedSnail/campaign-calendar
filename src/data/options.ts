@@ -2,6 +2,9 @@ import type { Brand, CampaignStatus } from '../types'
 
 export const TODAY = '2026-06-24'
 
+/** The logged-in coordinator. In a real app this would come from auth/session. */
+export const CURRENT_USER = { name: 'Jan Stoker', firstName: 'Jan' }
+
 export const SBU_OPTIONS = [
   'Industrial',
   'Automotive',

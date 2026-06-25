@@ -44,38 +44,7 @@ export interface Recipient {
   role: string
 }
 
-/** Simplified per-element production-timeline stages. */
-export type ElementStage =
-  | 'Briefed'
-  | 'Accepted'
-  | 'In progress'
-  | 'Ready for UAT'
-  | 'Live'
-
-export type ElementStatus = 'On track' | 'At risk' | 'Complete'
-
 export type ProgressDot = 'gray' | 'blue' | 'amber' | 'green'
-
-/** A stage in the overarching campaign-progress stepper (broader statuses). */
-export interface CampaignProgressStage {
-  label: string
-  dot: ProgressDot
-}
-
-/**
- * A row in the production-timeline Gantt. Positions are business-day indices
- * along the timeline axis (0 = brief date, see AXIS in ProductionView).
- */
-export interface ProductionElement {
-  name: string
-  status: ElementStatus
-  currentStage: ElementStage
-  start: number
-  doneEnd: number // end of the completed (blue) portion
-  currentEnd: number // end of the current-stage (amber) portion
-  end: number // end of the upcoming (gray) portion
-  marker: 'open' | 'done' | 'risk'
-}
 
 /** The 5 Azure DevOps work-item stages a ticket moves through (brief → go-live). */
 export type TicketStage =
@@ -97,20 +66,6 @@ export interface DevOpsTicket {
   sla: TicketSla
   assignee: string
   dueDate: string // display string, e.g. '08 Jul'
-}
-
-export interface ProductionData {
-  briefedDate: string
-  goLiveDate: string
-  overallProgress: number
-  avgThroughput: string
-  avgThroughputCaption: string
-  sla: string
-  slaCaption: string
-  timeToGoLive: string
-  timeToGoLiveCaption: string
-  progressStages: CampaignProgressStage[]
-  elements: ProductionElement[]
 }
 
 export interface Campaign {
@@ -151,5 +106,8 @@ export interface Campaign {
   briefId?: string
   briefedAt?: string
 
-  production?: ProductionData
+  /** Canonical production schedule (ISO yyyy-mm-dd) for in-flight campaigns.
+   *  Drives both the production-Gantt axis and the coordinator go-live math. */
+  briefedDate?: string
+  goLiveDate?: string
 }

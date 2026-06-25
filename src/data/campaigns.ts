@@ -1,4 +1,5 @@
-import type { BriefingAsset, Campaign, CampaignAssets, LocalizationAsset, ProductionData, TrackingAsset } from '../types'
+import type { BriefingAsset, Campaign, CampaignAssets, LocalizationAsset, TrackingAsset } from '../types'
+import { CURRENT_USER } from './options'
 
 const blankBriefing = (): BriefingAsset => ({ selected: false, brief: '', reference: '', briefingDoc: '' })
 const blankTracking = (): TrackingAsset => ({ selected: false, provider: '', pixelId: '', events: '' })
@@ -28,35 +29,6 @@ const fullAssets = (): CampaignAssets => ({
   localization: { selected: true, languages: ['English (UK)', 'German'] },
 })
 
-const loctiteProduction: ProductionData = {
-  briefedDate: '12 Jun 2026',
-  goLiveDate: '03 Jul 2026',
-  overallProgress: 54,
-  avgThroughput: '9.4 d',
-  avgThroughputCaption: 'briefed → live · target 10 d',
-  sla: '4 / 5',
-  slaCaption: 'on track · 1 at risk · 0 overdue',
-  timeToGoLive: '7 days',
-  timeToGoLiveCaption: 'working days · go-live 03 Jul',
-  // Overarching campaign stepper — the broader statuses.
-  progressStages: [
-    { label: 'Briefed', dot: 'gray' },
-    { label: 'Accepted', dot: 'blue' },
-    { label: 'In progress', dot: 'amber' },
-    { label: 'Ready for UAT', dot: 'blue' },
-    { label: 'Live', dot: 'green' },
-  ],
-  // Production-timeline Gantt rows. Positions are business-day indices on the
-  // axis (0 = 12 Jun brief date … 15 = 03 Jul go-live, see AXIS in the view).
-  elements: [
-    { name: 'Landing page', status: 'On track', currentStage: 'In progress', start: 5, doneEnd: 6, currentEnd: 12, end: 15, marker: 'open' },
-    { name: 'Form', status: 'On track', currentStage: 'In progress', start: 2, doneEnd: 8, currentEnd: 10, end: 13, marker: 'open' },
-    { name: 'Email', status: 'On track', currentStage: 'Ready for UAT', start: 1, doneEnd: 10, currentEnd: 11.5, end: 12.5, marker: 'open' },
-    { name: 'UTM campaign name', status: 'Complete', currentStage: 'Live', start: 0.5, doneEnd: 6, currentEnd: 6, end: 6, marker: 'done' },
-    { name: 'Tracking pixel implementation', status: 'At risk', currentStage: 'Briefed', start: 6, doneEnd: 6.7, currentEnd: 6.7, end: 17, marker: 'risk' },
-  ],
-}
-
 export const seedCampaigns: Campaign[] = [
   {
     id: 'loctite-243-relaunch',
@@ -85,7 +57,8 @@ export const seedCampaigns: Campaign[] = [
       { name: 'Localization', role: '' },
       { name: 'Distributor mktg', role: '' },
     ],
-    production: loctiteProduction,
+    briefedDate: '2026-06-12',
+    goLiveDate: '2026-07-03',
   },
   {
     id: 'technomelt-packaging-demo',
@@ -238,6 +211,8 @@ export const seedCampaigns: Campaign[] = [
       forms: briefing('Capture contact + use case', 'emea-form-brief.pdf'),
     },
     recipients: [],
+    briefedDate: '2026-06-19',
+    goLiveDate: '2026-07-03',
   },
   {
     id: 'adhesive-selector-email',
@@ -333,15 +308,17 @@ export const seedCampaigns: Campaign[] = [
       emailBriefing: briefing('Q3 industrial push announcement', 'q3-email-brief.pdf'),
     },
     recipients: [],
+    briefedDate: '2026-06-23',
+    goLiveDate: '2026-07-08',
   },
 ]
 
 // Assign a campaign coordinator (the marketing-ops PM) to every campaign.
-// Jan Stoker is the logged-in coordinator; a couple are run by a colleague for variety.
+// The logged-in coordinator (CURRENT_USER) owns most; a couple run by a colleague for variety.
 const COORDINATOR_OVERRIDE: Record<string, string> = {
   'technomelt-packaging-demo': 'M. Sauer',
   'technomelt-emea-push': 'M. Sauer',
 }
 for (const c of seedCampaigns) {
-  c.coordinator = COORDINATOR_OVERRIDE[c.id] ?? 'Jan Stoker'
+  c.coordinator = COORDINATOR_OVERRIDE[c.id] ?? CURRENT_USER.name
 }

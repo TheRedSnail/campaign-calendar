@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue'
 import type { Campaign, DevOpsTicket, TicketSla, TicketStage } from '../types'
 import { useCampaigns } from './useCampaigns'
-import { OWNER_OPTIONS, TODAY } from '../data/options'
+import { CURRENT_USER, OWNER_OPTIONS, TODAY } from '../data/options'
 import {
   generateTickets,
   seedTickets,
@@ -26,19 +26,40 @@ const state = reactive<CoordState>({
 
 const stageIndex = (s: TicketStage) => TICKET_STAGES.indexOf(s)
 const SLA_RANK: Record<TicketSla, number> = { 'On track': 0, 'At risk': 1, Overdue: 2 }
+const IDX_IN_PROGRESS = stageIndex('In progress')
+const IDX_READY = stageIndex('Ready for UAT')
+
+/** Canonical go-live date for a campaign (falls back to its schedule end). */
+const goLiveOf = (c: Campaign) => c.goLiveDate ?? c.endDate
 
 export function ticketsFor(id: string): DevOpsTicket[] {
   return state.tickets.filter((t) => t.campaignId === id)
 }
 
-/** Least-advanced stage across a campaign's tickets (the stage it's "at"). */
+/**
+ * The single campaign-stage rule used everywhere (steppers, funnel, portfolio):
+ *   Briefed       — not accepted yet (still in triage)
+ *   Accepted      — accepted, but no child ticket has started
+ *   In progress   — at least one child ticket is In progress (or beyond)
+ *   Ready for UAT — every child ticket is at Ready for UAT or beyond
+ *   Live          — the campaign (parent) is live: every child ticket is Live
+ */
 export function campaignStage(c: Campaign): TicketStage {
+  if (c.status !== 'in_production') return 'Briefed'
   const ts = ticketsFor(c.id)
-  if (!ts.length) return 'Briefed'
-  return ts.reduce((min, t) => (stageIndex(t.stage) < stageIndex(min) ? t.stage : min), ts[0].stage)
+  if (!ts.length) return 'Accepted'
+  if (ts.every((t) => t.stage === 'Live')) return 'Live'
+  if (ts.every((t) => stageIndex(t.stage) >= IDX_READY)) return 'Ready for UAT'
+  if (ts.some((t) => stageIndex(t.stage) >= IDX_IN_PROGRESS)) return 'In progress'
+  return 'Accepted'
 }
 
-/** 0–100 from the average stage index across tickets. */
+/** Index of the campaign stage in TICKET_STAGES — drives every stepper. */
+export function campaignStageIndex(c: Campaign): number {
+  return stageIndex(campaignStage(c))
+}
+
+/** 0–100 from the average stage index across tickets (continuous progress bar). */
 export function campaignProgress(c: Campaign): number {
   const ts = ticketsFor(c.id)
   if (!ts.length) return 0
@@ -56,6 +77,17 @@ export function campaignSla(c: Campaign): TicketSla {
 
 export function riskCount(c: Campaign): number {
   return ticketsFor(c.id).filter((t) => t.sla !== 'On track').length
+}
+
+/** Ticket SLA tally for a campaign (reused by KPI captions). */
+export function slaBreakdown(c: Campaign) {
+  const ts = ticketsFor(c.id)
+  return {
+    total: ts.length,
+    onTrack: ts.filter((t) => t.sla === 'On track').length,
+    atRisk: ts.filter((t) => t.sla === 'At risk').length,
+    overdue: ts.filter((t) => t.sla === 'Overdue').length,
+  }
 }
 
 const parse = (iso: string) => new Date(iso + 'T00:00:00')
@@ -77,7 +109,7 @@ const atRiskTickets = computed(() => state.tickets.filter((t) => t.sla !== 'On t
 const dashboardKpis = computed(() => {
   const riskCampaigns = new Set(atRiskTickets.value.map((t) => t.campaignId))
   const goLives = inFlight.value.filter((c) => {
-    const d = daysBetween(TODAY, c.endDate)
+    const d = daysBetween(TODAY, goLiveOf(c))
     return d >= 0 && d <= 7
   })
   return {
@@ -86,18 +118,18 @@ const dashboardKpis = computed(() => {
     atRisk: atRiskTickets.value.length,
     atRiskCampaigns: riskCampaigns.size,
     goLivesThisWeek: goLives.length,
-    nextGoLive: [...inFlight.value].sort((a, b) => a.endDate.localeCompare(b.endDate))[0] ?? null,
+    nextGoLive: [...inFlight.value].sort((a, b) => goLiveOf(a).localeCompare(goLiveOf(b)))[0] ?? null,
   }
 })
 
 const myCampaigns = computed(() =>
   campaigns.value
-    .filter((c) => (c.status === 'in_production' || c.status === 'briefed') && c.coordinator === 'Jan Stoker')
+    .filter((c) => (c.status === 'in_production' || c.status === 'briefed') && c.coordinator === CURRENT_USER.name)
     .sort((a, b) => SLA_RANK[campaignSla(b)] - SLA_RANK[campaignSla(a)]),
 )
 
 const upcomingGoLives = computed(() =>
-  [...inFlight.value].sort((a, b) => a.endDate.localeCompare(b.endDate)).slice(0, 5),
+  [...inFlight.value].sort((a, b) => goLiveOf(a).localeCompare(goLiveOf(b))).slice(0, 5),
 )
 
 const pipelineCounts = computed(() => {
@@ -116,7 +148,7 @@ const portfolioRows = computed(() =>
       sla: campaignSla(c),
       risk: riskCount(c),
     }))
-    .sort((a, b) => SLA_RANK[b.sla] - SLA_RANK[a.sla] || a.campaign.endDate.localeCompare(b.campaign.endDate)),
+    .sort((a, b) => SLA_RANK[b.sla] - SLA_RANK[a.sla] || goLiveOf(a.campaign).localeCompare(goLiveOf(b.campaign))),
 )
 
 export interface TeamLoad {
@@ -160,6 +192,15 @@ const STATIC_CYCLE: { stage: TicketStage; days: number }[] = [
   { stage: 'In progress', days: 5.2 },
   { stage: 'Ready for UAT', days: 1.6 },
 ]
+/** Total briefed→live cycle, derived from the per-stage figures above. */
+const AVG_CYCLE_DAYS = STATIC_CYCLE.reduce((s, r) => s + r.days, 0)
+
+const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+/** Trailing 6 month labels ending at the current month (from TODAY). */
+const TREND_MONTHS = (() => {
+  const m = new Date(TODAY + 'T00:00:00').getMonth()
+  return Array.from({ length: 6 }, (_, i) => MONTH_ABBR[(m - 5 + i + 12) % 12])
+})()
 
 const analytics = computed(() => {
   const total = state.tickets.length || 1
@@ -176,14 +217,15 @@ const analytics = computed(() => {
     slaPct,
     atRisk: atRiskTickets.value.length,
     live,
-    avgCycle: '9.4 d',
+    avgCycle: `${AVG_CYCLE_DAYS.toFixed(1)} d`,
     cycleByStage: STATIC_CYCLE,
     bottleneck,
     stageLoad: load,
-    // illustrative 6-month trends; final SLA bar ties to the live number
+    // Historical trends: illustrative seed (a prototype has no past data to derive
+    // from). The final SLA bar ties to the live number; months derive from TODAY.
     slaTrend: [78, 82, 80, 85, 88, slaPct],
     throughputTrend: [3, 4, 2, 5, 4, 3],
-    trendMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    trendMonths: TREND_MONTHS,
   }
 })
 
@@ -241,9 +283,11 @@ export function useCoordinator() {
     // derived helpers
     ticketsFor,
     campaignStage,
+    campaignStageIndex,
     campaignProgress,
     campaignSla,
     riskCount,
+    slaBreakdown,
     campaignName,
     // actions
     acceptBrief,

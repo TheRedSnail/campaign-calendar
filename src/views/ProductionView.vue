@@ -4,48 +4,47 @@ import { useRoute, useRouter } from 'vue-router'
 import KpiCard from '../components/KpiCard.vue'
 import StageStepper from '../components/StageStepper.vue'
 import { useCampaigns } from '../composables/useCampaigns'
-import type { ProductionElement, ElementStatus } from '../types'
+import { useCoordinator } from '../composables/useCoordinator'
+import { TICKET_STAGES, fmtDate } from '../data/coordinator'
+import { TODAY, STATUS_META } from '../data/options'
+import { buildProductionTimeline, type GanttRow } from '../utils/production'
 
 const route = useRoute()
 const router = useRouter()
 const { campaigns } = useCampaigns()
+const { ticketsFor, campaignStageIndex, campaignProgress, slaBreakdown } = useCoordinator()
 
 const campaign = computed(() => campaigns.value.find((c) => c.id === route.params.id))
-const prod = computed(() => campaign.value?.production)
+const tickets = computed(() => (campaign.value ? ticketsFor(campaign.value.id) : []))
 
-// ── Timeline axis (business-day indices) ──────────────────────────────
-const AXIS_MAX = 18
-const TICKS = [
-  { label: '12 Jun', idx: 0 },
-  { label: '15 Jun', idx: 1 },
-  { label: '22 Jun', idx: 6 },
-  { label: '29 Jun', idx: 11 },
-]
-const TODAY_IDX = 8
-const GOLIVE_IDX = 15
-const pos = (idx: number) => (idx / AXIS_MAX) * 100
+// Everything below derives from the campaign's DevOps tickets — the single source of truth.
+const timeline = computed(() =>
+  campaign.value ? buildProductionTimeline(campaign.value, tickets.value, TODAY) : null,
+)
+const briefedDate = computed(() => campaign.value?.briefedDate ?? campaign.value?.startDate ?? '')
+const goLiveDate = computed(() => campaign.value?.goLiveDate ?? campaign.value?.endDate ?? '')
 
-const stageLabels = computed(() => prod.value?.progressStages.map((s) => s.label) ?? [])
-
-/** Representative position of the campaign in the stage flow: the rounded
- * average of where its elements currently sit. */
-const currentIndex = computed(() => {
-  const p = prod.value
-  if (!p || !p.elements.length) return 0
-  const order = stageLabels.value
-  const avg =
-    p.elements.reduce((sum, e) => sum + order.indexOf(e.currentStage), 0) / p.elements.length
-  return Math.round(avg)
+const sla = computed(() =>
+  campaign.value ? slaBreakdown(campaign.value) : { total: 0, onTrack: 0, atRisk: 0, overdue: 0 },
+)
+const currentIndex = computed(() => (campaign.value ? campaignStageIndex(campaign.value) : 0))
+const goLiveWorkingDays = computed(() => {
+  if (!timeline.value) return '—'
+  const d = timeline.value.goLiveIdx - timeline.value.todayIdx
+  return d > 0 ? `${d} days` : d === 0 ? 'today' : 'overdue'
 })
 
-const STATUS: Record<ElementStatus, { dot: string; text: string }> = {
+const pos = (idx: number) => (timeline.value ? (idx / timeline.value.axisMax) * 100 : 0)
+
+const STATUS: Record<string, { dot: string; text: string }> = {
   'On track': { dot: 'bg-green-500', text: 'text-gray-600' },
   'At risk': { dot: 'bg-amber-500', text: 'text-amber-600' },
+  Overdue: { dot: 'bg-red-500', text: 'text-red-600' },
   Complete: { dot: 'bg-blue-600', text: 'text-blue-700' },
 }
 
 /** Centre point (axis idx) for the current-stage label above a bar. */
-function headCenter(el: ProductionElement) {
+function headCenter(el: GanttRow) {
   return el.currentEnd > el.doneEnd
     ? (el.doneEnd + el.currentEnd) / 2
     : (el.start + el.doneEnd) / 2
@@ -58,7 +57,7 @@ function back() {
 
 <template>
   <div class="min-h-screen bg-[#f7f8fa]">
-    <div v-if="campaign && prod">
+    <div v-if="campaign && timeline && tickets.length">
       <!-- Header -->
       <header class="flex items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 py-3">
         <div class="flex items-center gap-3">
@@ -74,15 +73,15 @@ function back() {
           <h1 class="text-base font-semibold text-gray-900">{{ campaign.name }}</h1>
           <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
             <span class="size-1.5 rounded-full bg-blue-600" />
-            In production
+            {{ STATUS_META[campaign.status].label }}
           </span>
         </div>
         <div class="flex items-center gap-2">
           <span class="rounded-md bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
-            Briefed <span class="font-semibold text-gray-800">{{ prod.briefedDate }}</span>
+            Briefed <span class="font-semibold text-gray-800">{{ fmtDate(briefedDate) }}</span>
           </span>
           <span class="rounded-md bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
-            Go-live <span class="font-semibold text-gray-800">{{ prod.goLiveDate }}</span>
+            Go-live <span class="font-semibold text-gray-800">{{ fmtDate(goLiveDate) }}</span>
           </span>
           <UButton label="View brief" color="neutral" variant="outline" size="sm" @click="back" />
         </div>
@@ -91,21 +90,25 @@ function back() {
       <div class="mx-auto flex max-w-[1320px] flex-col gap-4 p-6">
         <!-- KPI cards -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="Overall progress" :value="`${prod.overallProgress}%`" :progress="prod.overallProgress" />
+          <KpiCard label="Overall progress" :value="`${campaignProgress(campaign)}%`" :progress="campaignProgress(campaign)" />
           <KpiCard
-            label="Avg throughput / element"
-            :value="prod.avgThroughput"
-            :caption="prod.avgThroughputCaption"
-            caption-class="text-green-600"
+            label="SLA adherence"
+            :value="`${sla.onTrack} / ${sla.total}`"
+            :caption="`${sla.onTrack} on track · ${sla.atRisk} at risk · ${sla.overdue} overdue`"
+            :caption-class="sla.overdue ? 'text-red-600' : sla.atRisk ? 'text-amber-600' : 'text-green-600'"
           />
-          <KpiCard label="SLA adherence" :value="prod.sla" :caption="prod.slaCaption" />
-          <KpiCard label="Time to go-live" :value="prod.timeToGoLive" :caption="prod.timeToGoLiveCaption" />
+          <KpiCard label="Work items" :value="String(sla.total)" caption="across operational teams" />
+          <KpiCard
+            label="Time to go-live"
+            :value="goLiveWorkingDays"
+            :caption="`working days · go-live ${fmtDate(goLiveDate)}`"
+          />
         </div>
 
         <!-- Campaign progress (overarching broad statuses) -->
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <p class="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress</p>
-          <StageStepper :stages="stageLabels" :current-index="currentIndex" />
+          <StageStepper :stages="TICKET_STAGES" :current-index="currentIndex" />
         </div>
 
         <!-- Production timeline (Gantt) -->
@@ -114,7 +117,7 @@ function back() {
             <div>
               <h2 class="text-base font-semibold text-gray-900">Production timeline</h2>
               <p class="mt-0.5 text-xs text-gray-400">
-                {{ prod.elements.length }} elements · brief → go-live · 5 stages over 10 business days each
+                {{ tickets.length }} work items · brief → go-live · {{ TICKET_STAGES.length }} stages
               </p>
             </div>
             <div class="flex items-center gap-4 text-xs text-gray-500">
@@ -130,14 +133,14 @@ function back() {
             <div class="w-56 shrink-0">
               <div class="h-10" />
               <div
-                v-for="el in prod.elements"
-                :key="el.name"
+                v-for="el in timeline.rows"
+                :key="el.ticketId"
                 class="flex h-[72px] flex-col justify-center"
               >
                 <div class="text-sm font-medium text-gray-900">{{ el.name }}</div>
-                <div class="mt-1 inline-flex items-center gap-1.5 text-xs font-medium" :class="STATUS[el.status].text">
-                  <span class="size-1.5 rounded-full" :class="STATUS[el.status].dot" />
-                  {{ el.status }}
+                <div class="mt-1 inline-flex items-center gap-1.5 text-xs font-medium" :class="STATUS[el.statusLabel].text">
+                  <span class="size-1.5 rounded-full" :class="STATUS[el.statusLabel].dot" />
+                  {{ el.statusLabel }}
                 </div>
               </div>
             </div>
@@ -147,7 +150,7 @@ function back() {
               <!-- axis labels -->
               <div class="relative h-10">
                 <span
-                  v-for="t in TICKS"
+                  v-for="t in timeline.ticks"
                   :key="t.label"
                   class="absolute top-4 text-xs text-gray-400"
                   :style="{ left: `${pos(t.idx)}%` }"
@@ -156,41 +159,41 @@ function back() {
                 </span>
                 <div
                   class="absolute top-0 -translate-x-1/2 rounded bg-gray-800 px-2 py-0.5 text-[11px] font-medium text-white"
-                  :style="{ left: `${pos(TODAY_IDX)}%` }"
+                  :style="{ left: `${pos(timeline.todayIdx)}%` }"
                 >
-                  Today · 24 Jun
+                  Today · {{ fmtDate(TODAY) }}
                 </div>
                 <div
                   class="absolute top-0 -translate-x-1/2 rounded bg-blue-600 px-2 py-0.5 text-[11px] font-medium text-white"
-                  :style="{ left: `${pos(GOLIVE_IDX)}%` }"
+                  :style="{ left: `${pos(timeline.goLiveIdx)}%` }"
                 >
-                  Go-live · 03 Jul
+                  Go-live · {{ fmtDate(goLiveDate) }}
                 </div>
               </div>
 
               <!-- gridlines + markers overlay (span all rows) -->
               <div class="pointer-events-none absolute inset-x-0 bottom-0" :style="{ top: '40px' }">
                 <div
-                  v-for="t in TICKS"
+                  v-for="t in timeline.ticks"
                   :key="t.label"
                   class="absolute bottom-0 top-0 w-px bg-gray-100"
                   :style="{ left: `${pos(t.idx)}%` }"
                 />
                 <div
                   class="absolute bottom-0 top-0 w-px bg-gray-400/70"
-                  :style="{ left: `${pos(TODAY_IDX)}%` }"
+                  :style="{ left: `${pos(timeline.todayIdx)}%` }"
                 />
                 <div
                   class="absolute bottom-0 top-0 w-0.5 bg-blue-500/80"
-                  :style="{ left: `${pos(GOLIVE_IDX)}%` }"
+                  :style="{ left: `${pos(timeline.goLiveIdx)}%` }"
                 />
               </div>
 
               <!-- element rows -->
               <div class="relative">
                 <div
-                  v-for="el in prod.elements"
-                  :key="el.name"
+                  v-for="el in timeline.rows"
+                  :key="el.ticketId"
                   class="relative h-[72px] border-t border-gray-100"
                 >
                   <!-- current-stage label -->
@@ -198,7 +201,7 @@ function back() {
                     class="absolute top-3 -translate-x-1/2 whitespace-nowrap text-[11px] text-gray-500"
                     :style="{ left: `${pos(headCenter(el))}%` }"
                   >
-                    {{ el.currentStage }}
+                    {{ el.stage }}
                   </span>
 
                   <!-- bar -->

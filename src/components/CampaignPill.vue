@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { Campaign } from '../types'
 import { STATUS_META } from '../data/options'
+import { useCoordinator } from '../composables/useCoordinator'
 
 const props = withDefaults(
   defineProps<{ campaign: Campaign; showPercent?: boolean }>(),
@@ -9,7 +10,12 @@ const props = withDefaults(
 )
 defineEmits<{ (e: 'select', id: string): void }>()
 
+const { campaignProgress } = useCoordinator()
 const meta = computed(() => STATUS_META[props.campaign.status])
+// In-flight campaigns show live ticket-derived progress; others use brief completion.
+const progressPct = computed(() =>
+  props.campaign.status === 'in_production' ? campaignProgress(props.campaign) : props.campaign.progress,
+)
 </script>
 
 <template>
@@ -24,7 +30,7 @@ const meta = computed(() => STATUS_META[props.campaign.status])
       v-if="props.showPercent"
       class="shrink-0 rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-semibold leading-none"
     >
-      {{ campaign.progress }}%
+      {{ progressPct }}%
     </span>
   </button>
 </template>

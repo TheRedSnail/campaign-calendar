@@ -6,6 +6,7 @@ import TagMultiSelect from './TagMultiSelect.vue'
 import AssetCard from './AssetCard.vue'
 import FileUpload from './FileUpload.vue'
 import { useCampaigns } from '../composables/useCampaigns'
+import { useCoordinator } from '../composables/useCoordinator'
 import { useCompletion, assetComplete, type SectionStatus } from '../composables/useCompletion'
 import {
   SBU_OPTIONS,
@@ -16,12 +17,17 @@ import {
   REGION_OPTIONS,
   CHANNEL_OPTIONS,
   OWNER_OPTIONS,
+  STATUS_META,
 } from '../data/options'
 import type { CampaignStatus } from '../types'
 
 const router = useRouter()
 const { selected, drawerOpen, closeDrawer, openBrief, touchSelected } = useCampaigns()
+const { ticketsFor } = useCoordinator()
 const { sections, done, total, canBrief, percent } = useCompletion(selected)
+
+/** Production status exists once a brief is accepted and DevOps tickets are created. */
+const hasProduction = computed(() => !!selected.value && ticketsFor(selected.value.id).length > 0)
 
 const sectionMap = computed<Record<string, SectionStatus>>(() =>
   Object.fromEntries(sections.value.map((s) => [s.key, s])),
@@ -31,7 +37,7 @@ const sectionMap = computed<Record<string, SectionStatus>>(() =>
 const headerStatus = computed<{ status: CampaignStatus; label: string }>(() => {
   const c = selected.value
   if (c && (c.status === 'briefed' || c.status === 'in_production')) {
-    return { status: c.status, label: c.status === 'briefed' ? 'Briefed' : 'In production' }
+    return { status: c.status, label: STATUS_META[c.status].label }
   }
   if (canBrief.value) return { status: 'ready', label: 'Ready to brief' }
   if (done.value > 0) return { status: 'in_progress', label: 'In progress' }
@@ -301,7 +307,7 @@ const check = 'i-lucide-check'
     <template #footer>
       <div v-if="selected" class="flex w-full flex-col gap-3">
         <button
-          v-if="selected.production"
+          v-if="hasProduction"
           type="button"
           class="flex items-center justify-center gap-1 text-sm font-medium text-blue-600 hover:underline"
           @click="viewProduction"

@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCampaigns } from '../composables/useCampaigns'
+import { useCoordinator } from '../composables/useCoordinator'
 import { buildMonthCells, buildMonthBars, WEEKDAYS, type MonthBar } from '../utils/dates'
 import { TODAY, STATUS_META } from '../data/options'
+import type { Campaign } from '../types'
 
 const { currentMonth, filtered, openDrawer } = useCampaigns()
+const { campaignProgress } = useCoordinator()
+
+/** In-flight campaigns show live ticket-derived progress; others use brief completion. */
+const displayProgress = (c: Campaign) =>
+  c.status === 'in_production' ? campaignProgress(c) : c.progress
 
 const cells = computed(() => buildMonthCells(currentMonth.value, TODAY))
 const weeksCells = computed(() => [0, 1, 2, 3, 4].map((w) => cells.value.slice(w * 7, w * 7 + 7)))
@@ -80,7 +87,7 @@ function barStyle(bar: MonthBar) {
           >
             <span class="flex-1 truncate" :class="{ 'opacity-90': !bar.isStart }">{{ bar.campaign.name }}</span>
             <span class="shrink-0 rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-semibold leading-none">
-              {{ bar.campaign.progress }}%
+              {{ displayProgress(bar.campaign) }}%
             </span>
           </button>
         </div>
