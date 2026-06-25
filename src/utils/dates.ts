@@ -1,3 +1,5 @@
+import type { Campaign } from '../types'
+
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -103,4 +105,59 @@ export function timelineBar(startISO: string, endISO: string): { left: number; w
   const left = timelineFraction(startISO)
   const right = timelineFraction(endISO)
   return { left: left * 100, width: Math.max(2, (right - left) * 100) }
+}
+
+export interface MonthBar {
+  id: string
+  campaign: Campaign
+  lane: number
+  startCol: number // 0-6 within the week
+  endCol: number
+  isStart: boolean // segment contains the campaign's real start day
+}
+
+/**
+ * Lay campaigns out as multi-day bars over a 35-cell month grid.
+ * Returns one array of bar segments per week row (5 weeks). A campaign that
+ * spans week boundaries is split into one segment per week; lanes are assigned
+ * greedily so a campaign keeps the same lane across the whole grid.
+ */
+export function buildMonthBars(cells: DayCell[], campaigns: Campaign[]): MonthBar[][] {
+  const weeks: MonthBar[][] = [[], [], [], [], []]
+  if (!cells.length) return weeks
+  const gridStart = parseISO(cells[0].iso).getTime()
+  const dayIdx = (iso: string) => Math.round((parseISO(iso).getTime() - gridStart) / DAY_MS)
+
+  const items = campaigns
+    .map((c) => ({ c, s: Math.max(0, dayIdx(c.startDate)), e: Math.min(34, dayIdx(c.endDate)), lane: 0 }))
+    .filter((it) => it.e >= it.s && it.s <= 34 && it.e >= 0)
+    .sort((a, b) => a.s - b.s || a.e - b.e)
+
+  const laneEnds: number[] = []
+  for (const it of items) {
+    let lane = laneEnds.findIndex((end) => end < it.s)
+    if (lane === -1) {
+      lane = laneEnds.length
+      laneEnds.push(it.e)
+    } else {
+      laneEnds[lane] = it.e
+    }
+    it.lane = lane
+  }
+
+  for (const it of items) {
+    const startWeek = Math.floor(it.s / 7)
+    const endWeek = Math.floor(it.e / 7)
+    for (let w = startWeek; w <= endWeek; w++) {
+      weeks[w].push({
+        id: it.c.id,
+        campaign: it.c,
+        lane: it.lane,
+        startCol: w === startWeek ? it.s % 7 : 0,
+        endCol: w === endWeek ? it.e % 7 : 6,
+        isStart: w === startWeek,
+      })
+    }
+  }
+  return weeks
 }
