@@ -115,7 +115,7 @@ function scopeLabel(u: Profile): string {
   <div class="flex min-h-screen flex-col bg-gray-50">
     <header class="flex h-16 shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-6">
       <div class="flex items-center gap-2">
-        <span class="flex size-7 items-center justify-center rounded-md bg-red-600 text-sm font-bold text-white">H</span>
+        <img src="/henkel-logo.png" alt="Henkel" class="h-7 w-auto" />
         <span class="text-base font-semibold tracking-wide text-gray-900">User management</span>
       </div>
       <nav class="flex items-center gap-1 pl-3">

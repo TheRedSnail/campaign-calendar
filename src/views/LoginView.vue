@@ -42,7 +42,7 @@ function useDemo(e: string) {
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4">
     <div class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-8 shadow-card">
       <div class="mb-6 flex items-center gap-2.5">
-        <span class="flex size-8 items-center justify-center rounded-md bg-red-600 text-base font-bold text-white">H</span>
+        <img src="/henkel-logo.png" alt="Henkel" class="h-9 w-auto" />
         <div>
           <h1 class="text-base font-semibold tracking-wide text-gray-900">Campaign Calendar</h1>
           <p class="text-xs text-gray-500">Henkel Adhesives</p>
