@@ -21,6 +21,18 @@ const rows = computed(() =>
 )
 
 const atRisk = computed(() => tickets.value.filter((t) => t.sla !== 'On track').length)
+
+// Colour-code each ticket row by its SLA (same palette as SlaBadge).
+const SLA_ROW_BG: Record<TicketSla, string> = {
+  'On track': 'bg-green-50/40 hover:bg-green-50/80',
+  'At risk': 'bg-amber-50/50 hover:bg-amber-50/90',
+  Overdue: 'bg-red-50/60 hover:bg-red-100/70',
+}
+const SLA_ACCENT: Record<TicketSla, string> = {
+  'On track': 'border-l-4 border-l-green-500',
+  'At risk': 'border-l-4 border-l-amber-500',
+  Overdue: 'border-l-4 border-l-red-500',
+}
 </script>
 
 <template>
@@ -56,9 +68,9 @@ const atRisk = computed(() => tickets.value.filter((t) => t.sla !== 'On track').
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr v-for="t in rows" :key="t.id" class="hover:bg-gray-50">
-            <td class="px-4 py-3">
-              <span class="rounded-md bg-gray-50 px-2 py-1 text-xs font-semibold text-blue-600">{{ t.id }}</span>
+          <tr v-for="t in rows" :key="t.id" class="transition-colors" :class="SLA_ROW_BG[t.sla]">
+            <td class="px-4 py-3" :class="SLA_ACCENT[t.sla]">
+              <span class="rounded-md bg-white/70 px-2 py-1 text-xs font-semibold text-blue-600">{{ t.id }}</span>
             </td>
             <td class="px-4 py-3">
               <RouterLink :to="`/coordinator/campaign/${t.campaignId}`" class="font-medium text-gray-900 hover:text-blue-600">
