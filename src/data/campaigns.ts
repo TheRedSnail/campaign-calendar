@@ -11,28 +11,32 @@ const emptyAssets = () => ({
 const loctiteProduction: ProductionData = {
   briefedDate: '12 Jun 2026',
   goLiveDate: '03 Jul 2026',
-  overallProgress: 64,
-  avgThroughput: '3.4 d',
-  avgThroughputCaption: 'briefed → live · target 4.0 d',
-  sla: '5 / 7',
-  slaCaption: 'elements on track · 1 at risk · 1 overdue',
-  timeToGoLive: '9 days',
-  timeToGoLiveCaption: 'target 03 Jul 2026',
-  stages: [
-    { label: 'Briefed', status: 'briefed', caption: '7 done', avgAfter: '2.1 d' },
-    { label: 'Drafting', status: 'in_progress', caption: '3 active', avgAfter: '3.0 d' },
-    { label: 'In review', status: 'briefed', caption: '1 active', avgAfter: '1.3 d' },
-    { label: 'Approved', status: 'ready', caption: '2 done', avgAfter: '0.6 d' },
-    { label: 'Live', status: 'ready', caption: '0 live' },
+  overallProgress: 54,
+  avgThroughput: '9.4 d',
+  avgThroughputCaption: 'briefed → live · target 10 d',
+  sla: '4 / 5',
+  slaCaption: 'on track · 1 at risk · 0 overdue',
+  timeToGoLive: '7 days',
+  timeToGoLiveCaption: 'working days · go-live 03 Jul',
+  // Overarching campaign stepper — keeps the broader statuses.
+  progressStages: [
+    { label: 'Briefed', dot: 'gray', count: '5/5', avgAfter: '0.5 d' },
+    { label: 'Accepted', dot: 'blue', count: '5/5', avgAfter: '0.6 d' },
+    { label: 'In progress', dot: 'amber', count: '4/5', avgAfter: '3.8 d' },
+    { label: 'QA', dot: 'amber', count: '3/5', avgAfter: '1.4 d' },
+    { label: 'Business review', dot: 'amber', count: '2/5', avgAfter: '1.5 d' },
+    { label: 'Ready for UAT', dot: 'blue', count: '1/5', avgAfter: '0.8 d' },
+    { label: 'Ready for go-live', dot: 'blue', count: '1/5', avgAfter: '0.9 d' },
+    { label: 'Live', dot: 'green', count: '1/5' },
   ],
+  // Production-timeline Gantt rows. Positions are business-day indices on the
+  // axis (0 = 12 Jun brief date … 15 = 03 Jul go-live, see AXIS in the view).
   elements: [
-    { id: 'EL-01', name: 'Hero key visual', channel: 'Display banner', owner: 'A. Weber', stage: 'Approved', status: 'On track', daysInStage: 0.6, due: '28 Jun', progress: 90 },
-    { id: 'EL-02', name: 'Product datasheet', channel: 'Print / PDF', owner: 'M. Roth', stage: 'Approved', status: 'On track', daysInStage: 1.0, due: '29 Jun', progress: 85 },
-    { id: 'EL-03', name: 'Launch email (DE)', channel: 'Email', owner: 'S. Klein', stage: 'In review', status: 'On track', daysInStage: 1.3, due: '30 Jun', progress: 70 },
-    { id: 'EL-04', name: 'Campaign landing page', channel: 'Web', owner: 'J. Stoker', stage: 'Drafting', status: 'On track', daysInStage: 2.0, due: '01 Jul', progress: 55 },
-    { id: 'EL-05', name: 'Social carousel', channel: 'Social', owner: 'L. Vogel', stage: 'Drafting', status: 'At risk', daysInStage: 4.2, due: '27 Jun', progress: 40 },
-    { id: 'EL-06', name: 'Paid search ads', channel: 'SEM', owner: 'P. Adler', stage: 'Drafting', status: 'Overdue', daysInStage: 5.1, due: '22 Jun', progress: 25 },
-    { id: 'EL-07', name: 'Trade-show banner', channel: 'Print / OOH', owner: 'A. Weber', stage: 'Briefed', status: 'On track', daysInStage: 1.0, due: '02 Jul', progress: 15 },
+    { name: 'Landing page', status: 'On track', currentStage: 'In progress', start: 5, doneEnd: 6, currentEnd: 12, end: 15, marker: 'open' },
+    { name: 'Form', status: 'On track', currentStage: 'QA', start: 2, doneEnd: 8, currentEnd: 10, end: 13, marker: 'open' },
+    { name: 'Email', status: 'On track', currentStage: 'Business review', start: 1, doneEnd: 10, currentEnd: 11.5, end: 12.5, marker: 'open' },
+    { name: 'UTM campaign name', status: 'Complete', currentStage: 'Live', start: 0.5, doneEnd: 6, currentEnd: 6, end: 6, marker: 'done' },
+    { name: 'Tracking pixel implementation', status: 'At risk', currentStage: 'Briefed', start: 6, doneEnd: 6.7, currentEnd: 6.7, end: 17, marker: 'risk' },
   ],
 }
 

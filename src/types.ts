@@ -20,26 +20,40 @@ export interface Recipient {
   role: string
 }
 
-export type ElementStage = 'Briefed' | 'Drafting' | 'In review' | 'Approved' | 'Live'
-export type ElementStatus = 'On track' | 'At risk' | 'Overdue'
+/** Simplified per-element production-timeline stages. */
+export type ElementStage =
+  | 'Briefed'
+  | 'In progress'
+  | 'QA'
+  | 'Business review'
+  | 'Ready for UAT'
+  | 'Live'
 
-export interface ProductionElement {
-  id: string
-  name: string
-  channel: string
-  owner: string
-  stage: ElementStage
-  status: ElementStatus
-  daysInStage: number
-  due: string
-  progress: number
+export type ElementStatus = 'On track' | 'At risk' | 'Complete'
+
+export type ProgressDot = 'gray' | 'blue' | 'amber' | 'green'
+
+/** A stage in the overarching campaign-progress stepper (broader statuses). */
+export interface CampaignProgressStage {
+  label: string
+  dot: ProgressDot
+  count: string // e.g. "5/5"
+  avgAfter?: string // Ø time to the next stage
 }
 
-export interface ProductionStage {
-  label: ElementStage
-  status: CampaignStatus
-  caption: string
-  avgAfter?: string
+/**
+ * A row in the production-timeline Gantt. Positions are business-day indices
+ * along the timeline axis (0 = brief date, see AXIS in ProductionView).
+ */
+export interface ProductionElement {
+  name: string
+  status: ElementStatus
+  currentStage: ElementStage
+  start: number
+  doneEnd: number // end of the completed (blue) portion
+  currentEnd: number // end of the current-stage (amber) portion
+  end: number // end of the upcoming (gray) portion
+  marker: 'open' | 'done' | 'risk'
 }
 
 export interface ProductionData {
@@ -52,7 +66,7 @@ export interface ProductionData {
   slaCaption: string
   timeToGoLive: string
   timeToGoLiveCaption: string
-  stages: ProductionStage[]
+  progressStages: CampaignProgressStage[]
   elements: ProductionElement[]
 }
 
