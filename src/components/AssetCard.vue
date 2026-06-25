@@ -8,7 +8,7 @@ const emit = defineEmits<{ (e: 'update:selected', value: boolean): void }>()
     <label class="flex cursor-pointer items-center gap-2 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200">
       <UCheckbox
         :model-value="selected"
-        @update:model-value="(v) => emit('update:selected', v === true)"
+        @update:model-value="(v: boolean | 'indeterminate') => emit('update:selected', v === true)"
       />
       <span class="flex-1 font-medium">{{ label }}</span>
       <UIcon v-if="selected && complete" name="i-lucide-check" class="size-4 text-green-600" />
