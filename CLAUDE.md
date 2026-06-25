@@ -18,16 +18,19 @@ npm run build      # vue-tsc -b type-check + production build → dist/
 npm run typecheck  # vue-tsc --noEmit  (run this before committing)
 ```
 
-Deployed on Netlify (`netlify.toml`): builds `dist/`, with an SPA fallback so deep routes
-like `/campaign/:id/production` resolve on direct load.
+Source lives on GitHub at `github.com/TheRedSnail/campaign-calendar` (private). `netlify.toml`
+is configured (builds `dist/`, SPA fallback so deep routes like `/campaign/:id/production`
+resolve on direct load) and a Netlify project `campaign-calendar-wireframes` exists, but the
+deploy was never completed — the prototype currently runs locally / from the repo only.
 
 ## Architecture
 
 ```
 src/
   components/   AppHeader, FilterBar, FilterChip, MonthGrid, TimelineGantt,
-                CampaignPill, StatusBadge, TagMultiSelect, CampaignDrawer,
-                BriefModal, KpiCard
+                StatusBadge, TagMultiSelect, CampaignDrawer, BriefModal, KpiCard
+                (CampaignPill.vue is legacy/unused — the month grid now renders
+                 multi-day bars inline; safe to delete)
   composables/  useCampaigns (reactive store + drawer/filter state),
                 useCompletion (field-completion model, X / 20)
   data/         campaigns.ts (seed data), options.ts (option lists + STATUS_META tokens)
@@ -41,6 +44,9 @@ scripts/shots.mjs   Playwright screenshot driver to verify against the wireframe
 - **Routing**: `CalendarView` at `/`; `ProductionView` at `/campaign/:id/production`.
 - **Views map to wireframe frames**: Month grid (frame 1), Timeline/Gantt (frame 2),
   Campaign drawer (frames 3–4), Brief flow (frame 5), Production status (frame 6).
+- **Month grid renders multi-day spanning bars** (not single-day pills): `buildMonthBars`
+  in `utils/dates.ts` lays each campaign across its start→end columns, splitting at week
+  boundaries and assigning lanes greedily. `MonthGrid.vue` overlays them on the day-cell grid.
 
 ## Conventions
 
@@ -72,6 +78,21 @@ numbers (overallProgress, sla, etc.) consistent with the elements.
 
 ## Figma
 
-When editing the design, the wireframe lives in the file above. Frame 6 = `node-id 24:2`. Match
-`data/options.ts` tokens and the existing card styling (white surface, `#E3E6EA` 1px border,
-12px radius, Inter).
+When editing the design, the wireframe lives in the file above. Frame 6 = `node-id 24:2`,
+Month grid = `node-id 1:4`. Match `data/options.ts` tokens and the existing card styling
+(white surface, `#E3E6EA` 1px border, 12px radius, Inter).
+
+## Related surfaces (beyond this repo)
+
+This prototype is one of three representations of the same Campaign Calendar system:
+
+- **Figma wireframes** — the source of truth for the design (file `6KNP9QWvlyBGc3em9hYUxS`).
+- **Native Notion rebuild** — a working Notion workspace ("Campaign Calendar — Henkel
+  Adhesives" in the Team HQ teamspace) with Campaigns + Campaign Elements databases, calendar/
+  timeline/board views, and completion formulas.
+- **Azure DevOps integration (planned)** — when a coordinator accepts a brief in Notion, an
+  **Azure Logic App** creates one Azure DevOps work item per operational team (teams derived
+  from the campaign's Channels). The Notion side (review workflow, mapping + tickets DBs) is
+  built; the Logic App is delivered as a blueprint for the user to deploy in their tenant.
+
+Keep the prototype, Notion, and Figma in sync when the design changes.
