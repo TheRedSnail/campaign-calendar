@@ -42,7 +42,7 @@ function isActive(t: { to: string; exact?: boolean }) {
     <!-- top bar -->
     <header class="flex h-16 shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-6">
       <div class="flex items-center gap-2">
-        <img src="/henkel-logo.png" alt="Henkel" class="h-7 w-auto" />
+        <img src="/henkel-logo.png" alt="Henkel" class="h-10 w-auto" />
         <span class="text-base font-semibold tracking-wide text-gray-900">Campaign Calendar</span>
       </div>
       <nav class="flex items-center gap-1 pl-3">
