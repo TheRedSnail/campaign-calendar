@@ -83,11 +83,11 @@ export interface StatusMeta {
 }
 
 export const STATUS_META: Record<CampaignStatus, StatusMeta> = {
-  draft: { label: 'Draft', bg: 'bg-gray-400', text: 'text-white', dot: 'bg-gray-400', hex: '#9CA3AF' },
-  in_progress: { label: 'In progress', bg: 'bg-amber-500', text: 'text-white', dot: 'bg-amber-500', hex: '#F59E0B' },
-  ready: { label: 'Ready', bg: 'bg-green-600', text: 'text-white', dot: 'bg-green-600', hex: '#16A34A' },
-  briefed: { label: 'Briefed', bg: 'bg-blue-600', text: 'text-white', dot: 'bg-blue-600', hex: '#2563EB' },
-  in_production: { label: 'In production', bg: 'bg-blue-600', text: 'text-white', dot: 'bg-blue-600', hex: '#2563EB' },
+  draft: { label: 'Draft', bg: 'bg-gray-400', text: 'text-white', dot: 'bg-gray-400', hex: '#696969' },
+  in_progress: { label: 'In progress', bg: 'bg-amber-500', text: 'text-white', dot: 'bg-amber-500', hex: '#9A6800' },
+  ready: { label: 'Ready', bg: 'bg-green-600', text: 'text-white', dot: 'bg-green-600', hex: '#175641' },
+  briefed: { label: 'Briefed', bg: 'bg-blue-600', text: 'text-white', dot: 'bg-blue-600', hex: '#245E6F' },
+  in_production: { label: 'In production', bg: 'bg-blue-600', text: 'text-white', dot: 'bg-blue-600', hex: '#245E6F' },
 }
 
 /** Statuses shown in the calendar legend (order matters). */

@@ -50,10 +50,17 @@ scripts/shots.mjs   Playwright screenshot driver to verify against the wireframe
 
 ## Conventions
 
-- **Design tokens**: wireframe colours map onto Tailwind defaults, defined centrally in
-  `data/options.ts` (`STATUS_META`). accent/briefed `#2563EB` = `blue-600`, in-progress
-  `#F59E0B` = `amber-500`, ready/live `#16A34A` = `green-600`, draft `#9CA3AF` = `gray-400`.
-  Font: Inter. Reuse these tokens — don't hardcode new hex values.
+- **Design tokens**: `DESIGN.md` is authoritative for all visual decisions (Henkel brand).
+  The Tailwind ramps are **remapped to Henkel tones in `src/assets/css/main.css`** (`@theme`),
+  so existing semantic classes pick up the brand automatically: `gray-*` = warm neutrals
+  (text `#3B3B3B`, muted `#696969`, border `#E5E5E5`, page `#FBF9F9`), `red-*` = Primary Red
+  `#E1000F` (CTAs/interactive, set as Nuxt UI `primary` in `vite.config.ts`), `blue-*` =
+  Fresh Blue `#318096` (briefed/info), `amber-*` = Bright Orange `#FBA700` (in-progress/warning),
+  `green-*` = Deep/Sage Green `#175641` (ready/success). Status hexes live in `data/options.ts`
+  (`STATUS_META`). Substantial/expressive palette + `shadow-card`/`shadow-card-hover` tokens are
+  in `main.css`. Fonts: **HenkelGTFlexa** (display, uppercase h1/h2) + **Segoe UI** (body) — the
+  brand font is bundled at `public/fonts/HenkelGTFlexa-Md.otf` (see `public/fonts/README.md`).
+  Reuse tokens — don't hardcode new hex values.
 - Components are `<script setup lang="ts">`; prefer `computed` over watchers; keep mock data in
   `src/data/`, not inline in components.
 - Run `npm run typecheck` before committing.

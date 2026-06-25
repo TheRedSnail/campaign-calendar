@@ -23,7 +23,10 @@ function today() {
 <template>
   <header class="flex items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 py-3">
     <div class="flex items-center gap-4">
-      <h1 class="text-base font-semibold text-gray-900">Henkel Adhesives — Campaigns</h1>
+      <div class="flex items-center gap-2.5">
+        <span class="flex size-7 items-center justify-center rounded-md bg-red-600 text-sm font-bold text-white">H</span>
+        <h1 class="text-base font-semibold tracking-wide text-gray-900">Henkel Adhesives — Campaigns</h1>
+      </div>
       <div class="flex items-center gap-1 text-gray-700">
         <UButton
           icon="i-lucide-chevron-left"
@@ -78,6 +81,15 @@ function today() {
         to="/coordinator"
         icon="i-lucide-layout-dashboard"
         label="Coordinator"
+        color="neutral"
+        variant="outline"
+        size="sm"
+      />
+
+      <UButton
+        to="/config"
+        icon="i-lucide-settings"
+        label="Settings"
         color="neutral"
         variant="outline"
         size="sm"

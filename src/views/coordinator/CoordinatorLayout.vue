@@ -18,12 +18,12 @@ function isActive(t: { to: string; exact?: boolean }) {
 </script>
 
 <template>
-  <div class="flex h-screen flex-col bg-[#f7f8fa]">
+  <div class="flex h-screen flex-col bg-gray-50">
     <!-- top bar -->
     <header class="flex h-16 shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-6">
       <div class="flex items-center gap-2">
-        <div class="size-6 rounded-md bg-blue-600" />
-        <span class="text-base font-semibold text-gray-900">Campaign Calendar</span>
+        <span class="flex size-7 items-center justify-center rounded-md bg-red-600 text-sm font-bold text-white">H</span>
+        <span class="text-base font-semibold tracking-wide text-gray-900">Campaign Calendar</span>
       </div>
       <nav class="flex items-center gap-1 pl-3">
         <RouterLink
@@ -38,7 +38,7 @@ function isActive(t: { to: string; exact?: boolean }) {
       </nav>
       <div class="flex-1" />
       <span class="text-sm font-medium text-gray-500">Wed · 24 Jun 2026</span>
-      <div class="flex size-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+      <div class="flex size-8 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white">
         JS
       </div>
     </header>

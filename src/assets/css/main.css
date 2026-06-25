@@ -1,8 +1,129 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* ───────────────────────────────────────────────────────────────────
+   Henkel design system — see DESIGN.md (authoritative).
+   Brand font is bundled locally (the host serves no CORS headers).
+   Drop HenkelGTFlexa-Md.otf into public/fonts/ — until then the
+   Segoe UI fallback carries the brand (uppercase + weight).
+   ─────────────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: "HenkelGTFlexa";
+  src: url("/fonts/HenkelGTFlexa-Md.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Typography — Segoe UI body, HenkelGTFlexa display */
+  --font-sans: "Segoe UI", Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "HenkelGTFlexa", "Segoe UI", Helvetica, sans-serif;
+
+  /* ── Core ramps remapped to Henkel tones ────────────────────────
+     The prototype uses semantic ramps everywhere:
+       gray  → warm neutrals (text / borders / surfaces)
+       red   → Primary Red (CTAs, interactive, error)
+       blue  → Fresh Blue (briefed / info accents)
+       amber → Bright Orange (in-progress / warning)
+       green → Sage / Deep Green (ready / success)
+  */
+
+  /* Neutral — warm grey (text #3B3B3B, muted #696969, border #E5E5E5, page #FBF9F9) */
+  --color-gray-50: #fbf9f9;
+  --color-gray-100: #f2efef;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #ded7d6;
+  --color-gray-400: #b8afae;
+  --color-gray-500: #696969;
+  --color-gray-600: #585352;
+  --color-gray-700: #4d3938;
+  --color-gray-800: #3b3b3b;
+  --color-gray-900: #2a2424;
+  --color-gray-950: #1a1616;
+
+  /* Primary Red #E1000F (hover #C9000D) — also semantic error */
+  --color-red-50: #fdeaea;
+  --color-red-100: #fbd5d6;
+  --color-red-200: #f7aaac;
+  --color-red-300: #f37e82;
+  --color-red-400: #ef5359;
+  --color-red-500: #e92730;
+  --color-red-600: #e1000f;
+  --color-red-700: #c9000d;
+  --color-red-800: #a3000b;
+  --color-red-900: #7a0008;
+  --color-red-950: #520005;
+
+  /* Fresh Blue #318096 / Soft Blue — briefed + info accents */
+  --color-blue-50: #dde7ed;
+  --color-blue-100: #cde0e6;
+  --color-blue-200: #a9ccd6;
+  --color-blue-300: #7bb0bf;
+  --color-blue-400: #4e94a8;
+  --color-blue-500: #318096;
+  --color-blue-600: #2b7287;
+  --color-blue-700: #245e6f;
+  --color-blue-800: #1e4a57;
+  --color-blue-900: #173741;
+  --color-blue-950: #0f262d;
+
+  /* Bright Orange #FBA700 / Fresh Yellow — in-progress + warning */
+  --color-amber-50: #fff5e0;
+  --color-amber-100: #feebc0;
+  --color-amber-200: #fdd98c;
+  --color-amber-300: #fcc659;
+  --color-amber-400: #fbb42d;
+  --color-amber-500: #fba700;
+  --color-amber-600: #d98f00;
+  --color-amber-700: #9a6800;
+  --color-amber-800: #7a5200;
+  --color-amber-900: #5c3e00;
+  --color-amber-950: #3d2900;
+
+  /* Sage / Deep Green #175641 — ready + success */
+  --color-green-50: #e5ece5;
+  --color-green-100: #d2e2d2;
+  --color-green-200: #bfcfbe;
+  --color-green-300: #92b391;
+  --color-green-400: #4e8a6e;
+  --color-green-500: #1d7a55;
+  --color-green-600: #175641;
+  --color-green-700: #134736;
+  --color-green-800: #0f3a2c;
+  --color-green-900: #0b2c21;
+  --color-green-950: #061a14;
+
+  /* ── Substantial & expressive palette (DESIGN.md) ──────────────── */
+  --color-warmgrey: #ded7d6;
+  --color-warmgrey-light: #f2efef;
+  --color-warmgrey-dark: #4d3938;
+  --color-softblue: #bdcdda;
+  --color-softblue-light: #dde7ed;
+  --color-softblue-dark: #343b55;
+  --color-sage: #bfcfbe;
+  --color-sage-light: #e5ece5;
+  --color-sage-dark: #1d4941;
+  --color-deepgreen: #175641;
+  --color-freshblue: #318096;
+  --color-brightaqua: #005fbe;
+  --color-freshyellow: #f6e67d;
+  --color-brightorange: #fba700;
+  --color-electricyellow: #e8e200;
+  --color-deepviolet: #871964;
+  --color-darklilac: #69008c;
+  --color-softmint: #dfebc2;
+  --color-softpeach: #f4c59e;
+  --color-sky: #dce8ff;
+  --color-darkblue: #28325a;
+
+  /* Brand surfaces */
+  --color-primary-brand: #e1000f;
+  --color-page: #fbf9f9;
+
+  /* Elevation tokens (DESIGN.md shadows) */
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.18);
 }
 
 :root {
@@ -17,8 +138,59 @@ body,
 
 body {
   font-family: var(--font-sans);
-  background-color: #f7f8fa;
-  color: #1f2937;
+  background-color: var(--color-page);
+  color: #3b3b3b;
+  font-size: 1rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headlines — HenkelGTFlexa, uppercase for h1/h2 (DESIGN.md typography) */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+h1,
+h2 {
+  text-transform: uppercase;
+}
+
+/* Brand utility — opt-in display type for hero labels / KPI captions */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Accessible focus — 2px primary-color outline (DESIGN.md accessibility) */
+:where(a, button, [role="button"], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary-brand);
+  outline-offset: 2px;
+}
+
+/* ── Dark mode — activated via [data-theme="dark"] (DESIGN.md) ─────── */
+[data-theme="dark"] {
+  --color-gray-50: #1e1e1e;
+  --color-gray-100: #2a2424;
+  --color-gray-200: #2e2e2e;
+  --color-gray-300: #3a3a3a;
+  --color-gray-400: #6a6a6a;
+  --color-gray-500: #a0a0a0;
+  --color-gray-600: #b8b8b8;
+  --color-gray-700: #d0d0d0;
+  --color-gray-800: #e8e8e8;
+  --color-gray-900: #f2f2f2;
+
+  --color-red-600: #ff4d55;
+  --color-red-700: #cc2020;
+
+  --color-page: #121212;
+  --color-primary-brand: #ff4d55;
+
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 4px 24px rgba(0, 0, 0, 0.55);
+  --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.65);
+}
+[data-theme="dark"] body {
+  color: #e8e8e8;
 }

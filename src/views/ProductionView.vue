@@ -5,6 +5,7 @@ import KpiCard from '../components/KpiCard.vue'
 import StageStepper from '../components/StageStepper.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
+import { useTimelineConfig } from '../composables/useTimelineConfig'
 import { TICKET_STAGES, fmtDate } from '../data/coordinator'
 import { TODAY, STATUS_META } from '../data/options'
 import { buildProductionTimeline, type GanttRow } from '../utils/production'
@@ -13,13 +14,15 @@ const route = useRoute()
 const router = useRouter()
 const { campaigns } = useCampaigns()
 const { ticketsFor, campaignStageIndex, campaignProgress, slaBreakdown } = useCoordinator()
+const { phases } = useTimelineConfig()
 
 const campaign = computed(() => campaigns.value.find((c) => c.id === route.params.id))
 const tickets = computed(() => (campaign.value ? ticketsFor(campaign.value.id) : []))
 
 // Everything below derives from the campaign's DevOps tickets — the single source of truth.
+// Geometry (the phase chunks) comes from the coordinator's timeline config.
 const timeline = computed(() =>
-  campaign.value ? buildProductionTimeline(campaign.value, tickets.value, TODAY) : null,
+  campaign.value ? buildProductionTimeline(campaign.value, tickets.value, TODAY, phases.value) : null,
 )
 const briefedDate = computed(() => campaign.value?.briefedDate ?? campaign.value?.startDate ?? '')
 const goLiveDate = computed(() => campaign.value?.goLiveDate ?? campaign.value?.endDate ?? '')
@@ -56,7 +59,7 @@ function back() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#f7f8fa]">
+  <div class="min-h-screen bg-gray-50">
     <div v-if="campaign && timeline && tickets.length">
       <!-- Header -->
       <header class="flex items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 py-3">
@@ -106,18 +109,19 @@ function back() {
         </div>
 
         <!-- Campaign progress (overarching broad statuses) -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
           <p class="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress</p>
           <StageStepper :stages="TICKET_STAGES" :current-index="currentIndex" />
         </div>
 
         <!-- Production timeline (Gantt) -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
           <div class="mb-4 flex items-start justify-between">
             <div>
               <h2 class="text-base font-semibold text-gray-900">Production timeline</h2>
               <p class="mt-0.5 text-xs text-gray-400">
-                {{ tickets.length }} work items · brief → go-live · {{ TICKET_STAGES.length }} stages
+                {{ tickets.length }} work items · {{ timeline.phaseBands.length }} phases · brief →
+                Ready for UAT ({{ timeline.uatIdx }} business days)
               </p>
             </div>
             <div class="flex items-center gap-4 text-xs text-gray-500">
@@ -132,6 +136,9 @@ function back() {
             <!-- Left label column -->
             <div class="w-56 shrink-0">
               <div class="h-10" />
+              <div class="flex h-7 items-center text-[11px] font-medium uppercase tracking-wide text-gray-400">
+                Default plan
+              </div>
               <div
                 v-for="el in timeline.rows"
                 :key="el.ticketId"
@@ -169,6 +176,25 @@ function back() {
                 >
                   Go-live · {{ fmtDate(goLiveDate) }}
                 </div>
+                <div
+                  class="absolute bottom-0 -translate-x-1/2 whitespace-nowrap rounded bg-green-600 px-2 py-0.5 text-[11px] font-medium text-white"
+                  :style="{ left: `${pos(timeline.uatIdx)}%` }"
+                >
+                  ◆ UAT · day {{ timeline.uatIdx }}
+                </div>
+              </div>
+
+              <!-- phase bands (the configured chunking, applied to every track) -->
+              <div class="relative h-7">
+                <div
+                  v-for="(band, i) in timeline.phaseBands"
+                  :key="band.key"
+                  class="absolute inset-y-0 flex items-center justify-center overflow-hidden border-l border-gray-200 first:border-l-0"
+                  :class="i % 2 ? 'bg-gray-50' : 'bg-gray-100/70'"
+                  :style="{ left: `${pos(band.start)}%`, width: `${pos(band.end) - pos(band.start)}%` }"
+                >
+                  <span class="truncate px-1 text-[11px] font-medium text-gray-500">{{ band.label }}</span>
+                </div>
               </div>
 
               <!-- gridlines + markers overlay (span all rows) -->
@@ -186,6 +212,10 @@ function back() {
                 <div
                   class="absolute bottom-0 top-0 w-0.5 bg-blue-500/80"
                   :style="{ left: `${pos(timeline.goLiveIdx)}%` }"
+                />
+                <div
+                  class="absolute bottom-0 top-0 w-0.5 bg-green-500/70"
+                  :style="{ left: `${pos(timeline.uatIdx)}%` }"
                 />
               </div>
 
@@ -242,7 +272,7 @@ function back() {
                         left: `${pos(el.end)}%`,
                         borderTop: '6px solid transparent',
                         borderBottom: '6px solid transparent',
-                        borderLeft: '9px solid #16a34a',
+                        borderLeft: '9px solid #175641',
                       }"
                     />
                   </div>

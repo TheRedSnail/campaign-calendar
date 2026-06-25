@@ -6,6 +6,7 @@ import ui from '@nuxt/ui/vue-plugin'
 import App from './App.vue'
 import CalendarView from './views/CalendarView.vue'
 import ProductionView from './views/ProductionView.vue'
+import ConfigView from './views/ConfigView.vue'
 import CoordinatorLayout from './views/coordinator/CoordinatorLayout.vue'
 import CoordDashboard from './views/coordinator/CoordDashboard.vue'
 import CoordTriage from './views/coordinator/CoordTriage.vue'
@@ -20,6 +21,7 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'calendar', component: CalendarView },
     { path: '/campaign/:id/production', name: 'production', component: ProductionView },
+    { path: '/config', name: 'config', component: ConfigView },
     {
       path: '/coordinator',
       component: CoordinatorLayout,

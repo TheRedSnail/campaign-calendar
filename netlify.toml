@@ -8,3 +8,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# HenkelGTFlexa is bundled locally under /fonts, so 'self' is sufficient (see DESIGN.md).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; font-src 'self' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
