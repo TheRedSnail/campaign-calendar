@@ -7,7 +7,8 @@ export type CampaignStatus =
   | 'live'
   | 'ended'
 
-export type Brand = 'Next Henkel Adhesives' | 'Bekron' | 'Fester' | 'OSI'
+/** Brands are admin-managed (DB-backed), so this is an open string rather than a fixed union. */
+export type Brand = string
 
 /** Emails — pick a Marketo program type + describe it (see briefs.md). */
 export interface EmailAsset {

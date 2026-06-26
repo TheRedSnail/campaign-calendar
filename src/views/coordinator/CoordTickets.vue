@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useCoordinator, ASSIGNEE_OPTIONS } from '../../composables/useCoordinator'
-import { TICKET_STAGES, SLA_LIST, TEAM_ORDER } from '../../data/coordinator'
-import type { TicketSla, TicketStage } from '../../types'
+import { useCoordinator } from '../../composables/useCoordinator'
+import { TEAM_ORDER, devopsTicketUrl } from '../../data/coordinator'
+import type { TicketSla } from '../../types'
 import SlaBadge from '../../components/coordinator/SlaBadge.vue'
 import StagePill from '../../components/coordinator/StagePill.vue'
 
-const { tickets, campaignName, setTicketStage, setTicketSla, setTicketAssignee } = useCoordinator()
+const { tickets, campaignName } = useCoordinator()
 
 const teamFilter = ref<string>('All teams')
 const riskOnly = ref(false)
@@ -40,7 +40,7 @@ const SLA_ACCENT: Record<TicketSla, string> = {
     <div>
       <h1 class="text-2xl font-semibold text-gray-900">DevOps tickets</h1>
       <p class="mt-1 text-sm text-gray-500">
-        Change a ticket’s stage, SLA or assignee — every dashboard updates live.
+        Work items synced from Azure DevOps — open one in DevOps from its ticket ID.
         <span class="font-medium text-gray-700">{{ tickets.length }} tickets · {{ atRisk }} at risk</span>
       </p>
     </div>
@@ -71,7 +71,16 @@ const SLA_ACCENT: Record<TicketSla, string> = {
         <tbody class="divide-y divide-gray-100">
           <tr v-for="t in rows" :key="t.id" class="transition-colors" :class="SLA_ROW_BG[t.sla]">
             <td class="px-4 py-3" :class="SLA_ACCENT[t.sla]">
-              <span class="rounded-md bg-white/70 px-2 py-1 text-xs font-semibold text-blue-600">{{ t.id }}</span>
+              <a
+                :href="devopsTicketUrl(t)"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center gap-1 rounded-md bg-white/70 px-2 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50 hover:underline"
+                :title="`Open ${t.id} in Azure DevOps`"
+              >
+                {{ t.id }}
+                <UIcon name="i-lucide-external-link" class="size-3" />
+              </a>
             </td>
             <td class="px-4 py-3">
               <RouterLink :to="`/coordinator/campaign/${t.campaignId}`" class="font-medium text-gray-900 hover:text-blue-600">
@@ -80,33 +89,9 @@ const SLA_ACCENT: Record<TicketSla, string> = {
               <p class="text-xs text-gray-500">{{ t.title }}</p>
             </td>
             <td class="px-4 py-3 text-gray-600">{{ t.team }}</td>
-            <td class="px-4 py-3">
-              <USelect
-                :model-value="t.stage"
-                :items="TICKET_STAGES"
-                size="sm"
-                class="w-40"
-                @update:model-value="(v: TicketStage) => setTicketStage(t.id, v)"
-              />
-            </td>
-            <td class="px-4 py-3">
-              <USelect
-                :model-value="t.sla"
-                :items="SLA_LIST"
-                size="sm"
-                class="w-32"
-                @update:model-value="(v: TicketSla) => setTicketSla(t.id, v)"
-              />
-            </td>
-            <td class="px-4 py-3">
-              <USelect
-                :model-value="t.assignee"
-                :items="ASSIGNEE_OPTIONS"
-                size="sm"
-                class="w-40"
-                @update:model-value="(v: string) => setTicketAssignee(t.id, v)"
-              />
-            </td>
+            <td class="px-4 py-3"><StagePill :stage="t.stage" /></td>
+            <td class="px-4 py-3"><SlaBadge :sla="t.sla" /></td>
+            <td class="px-4 py-3 text-gray-700">{{ t.assignee || '—' }}</td>
             <td class="px-4 py-3 text-gray-700">{{ t.dueDate }}</td>
             <td class="px-4 py-3">
               <a

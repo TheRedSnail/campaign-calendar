@@ -44,6 +44,8 @@ const canSeeCoordinator = computed(
   () => role.value === 'campaign_coordinator' || role.value === 'run_team' || role.value === 'admin',
 )
 const displayName = computed(() => state.profile?.full_name || state.session?.user.email || 'Account')
+/** Where a freshly-authenticated user should land — coordinators open their dashboard. */
+const landingPath = computed(() => (role.value === 'campaign_coordinator' ? '/coordinator' : '/'))
 
 async function login(email: string, password: string) {
   const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -69,6 +71,7 @@ export function useAuth() {
     isOwner,
     canSeeCoordinator,
     displayName,
+    landingPath,
     initAuth,
     login,
     logout,

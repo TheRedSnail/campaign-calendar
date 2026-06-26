@@ -5,7 +5,7 @@ import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
 const route = useRoute()
-const { login } = useAuth()
+const { login, landingPath } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -21,7 +21,7 @@ async function onSubmit() {
     error.value = err.message || 'Could not sign in'
     return
   }
-  const redirect = (route.query.redirect as string) || '/'
+  const redirect = (route.query.redirect as string) || landingPath.value
   router.replace(redirect)
 }
 

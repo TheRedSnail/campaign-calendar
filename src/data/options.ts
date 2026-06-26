@@ -1,4 +1,4 @@
-import type { Brand, CampaignStatus } from '../types'
+import type { CampaignStatus } from '../types'
 import type { AppRole } from '../types/database'
 
 export const TODAY = '2026-06-24'
@@ -11,8 +11,12 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   admin: 'Admin',
 }
 
+// The lists below are FALLBACK DEFAULTS only. At runtime the admin-managed values come from
+// the DB via composables/useOptions.ts; these seed the database and keep the app working
+// offline / before the first fetch. Edit values in the /admin settings, not here.
+
 /** SBU codes from the existing Henkel ticket system (see briefs.md). */
-export const SBU_OPTIONS = [
+export const SBU_DEFAULTS = [
   'ACA',
   'ACE',
   'ACC',
@@ -25,9 +29,9 @@ export const SBU_OPTIONS = [
   'AQC',
 ]
 
-export const BRAND_OPTIONS: Brand[] = ['Next Henkel Adhesives', 'Bekron', 'Fester', 'OSI']
+export const BRAND_DEFAULTS: string[] = ['Next Henkel Adhesives', 'Bekron', 'Fester', 'OSI']
 
-export const TYPE_OPTIONS = [
+export const TYPE_DEFAULTS = [
   'Product relaunch',
   'Product launch',
   'Webinar',
@@ -37,9 +41,9 @@ export const TYPE_OPTIONS = [
   'Newsletter',
 ]
 
-export const PRIORITY_OPTIONS = ['Low', 'Medium', 'High', 'Critical']
+export const PRIORITY_DEFAULTS = ['Low', 'Medium', 'High', 'Critical']
 
-export const LANGUAGE_OPTIONS = [
+export const LANGUAGE_DEFAULTS = [
   'English (UK)',
   'English (US)',
   'German',
@@ -50,7 +54,7 @@ export const LANGUAGE_OPTIONS = [
 ]
 
 /** Country / region scope from the existing ticket system (see briefs.md). */
-export const REGION_OPTIONS = [
+export const REGION_DEFAULTS = [
   'Global',
   'Regional - APAC',
   'Regional - Middle East and Africa',
@@ -125,10 +129,10 @@ export const REGION_OPTIONS = [
 ]
 
 /** Country = the scoping dimension for owners (one) and RUN-team users (many). Same list. */
-export const COUNTRY_OPTIONS = REGION_OPTIONS
+export const COUNTRY_DEFAULTS = REGION_DEFAULTS
 
 /** Websites a campaign can target (see briefs.md). */
-export const WEBSITE_OPTIONS = [
+export const WEBSITE_DEFAULTS = [
   'Agorex',
   'Bekron',
   'Beta Website',
@@ -165,7 +169,7 @@ export const WEBSITE_OPTIONS = [
   'YouJustDo',
 ]
 
-export const CHANNEL_OPTIONS = [
+export const CHANNEL_DEFAULTS = [
   'Email',
   'LinkedIn',
   'Distributor portal',
@@ -177,7 +181,7 @@ export const CHANNEL_OPTIONS = [
 ]
 
 /** Email program types asked for in the ticket system (see briefs.md). */
-export const EMAIL_PROGRAM_OPTIONS = [
+export const EMAIL_PROGRAM_DEFAULTS = [
   'Email blast',
   'Newsletter',
   'Content download',
@@ -195,7 +199,7 @@ export const EMAIL_PROGRAM_OPTIONS = [
 export const EMAIL_REQUEST_TYPE = 'Create a new Marketo program based on an existing flow/journey'
 
 /** Tracking-pixel vendors (see briefs.md). */
-export const PIXEL_VENDOR_OPTIONS = [
+export const PIXEL_VENDOR_DEFAULTS = [
   'Facebook (meta)',
   'Google ads',
   'Bing',
@@ -211,7 +215,7 @@ export const PIXEL_VENDOR_OPTIONS = [
 
 export const PIXEL_TYPE_OPTIONS = ['Page View', 'Conversion']
 
-export const OWNER_OPTIONS = [
+export const OWNER_DEFAULTS = [
   'Markus Weber',
   'M. Roth',
   'S. Klein',

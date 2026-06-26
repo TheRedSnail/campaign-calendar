@@ -13,9 +13,19 @@ region eu-west-3). Auth, the Postgres schema, Row-Level Security, and an admin E
 ## Data model
 
 - `profiles` (1:1 with `auth.users`) — `role` (`campaign_owner` | `campaign_coordinator` | `run_team`
-  | `admin`), `sbus[]`, `countries[]`, `is_global`.
+  | `admin`), `sbus[]`, `countries[]`, `brands[]`, `regions[]`, `is_global`.
 - `campaigns` — the campaign records (with a `country` scoping field) — RLS-scoped.
 - `devops_tickets` — per-team work items; visibility follows the parent campaign.
+- `app_options` — admin-managed brief dropdown values, keyed `(kind, value)` with `active`/
+  `sort_order`. `kind ∈ {sbu, brand, campaign_type, priority, language, website, channel,
+  email_program, pixel_vendor, owner}`. The frontend reads these via `composables/useOptions.ts`
+  (with the hardcoded `*_DEFAULTS` in `src/data/options.ts` as an offline fallback).
+- `regions` + `countries` — structured geography (each country FK's to one region). `'Global'` is a
+  code sentinel meaning "all", not a row. Managed in the admin **Regions & countries** screen.
+
+`app_options` / `regions` / `countries` are readable by any authenticated user (everyone needs the
+dropdowns) and writable only by admins (`*_admin_all` RLS policies) — so the admin **Dropdown values**
+and **Regions & countries** screens write directly, no Edge Function needed.
 
 ## Row-Level Security (visibility)
 
@@ -26,6 +36,11 @@ region eu-west-3). Auth, the Postgres schema, Row-Level Security, and an admin E
 - **campaign_coordinator** — campaigns in any of their SBUs.
 - **run_team** — campaigns in any of their countries (or all, if `is_global`); across all SBUs.
 - **admin** — everything; only role allowed to DELETE.
+
+**Region → country expansion:** a user's `regions[]` scope is expanded to its member countries via
+the `countries.region_id` mapping (`region_member_countries` / `auth_visible_countries` helpers), so
+assigning a region grants visibility of every country in it; `'Global'` in `regions[]` (or
+`is_global`) sees all. Empty scope = no restriction (unchanged).
 
 ## Demo accounts (prototype only)
 
