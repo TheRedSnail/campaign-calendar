@@ -4,19 +4,13 @@ import FilterChip from './FilterChip.vue'
 import StatusBadge from './StatusBadge.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useAuth } from '../composables/useAuth'
-import {
-  SBU_OPTIONS,
-  BRAND_OPTIONS,
-  REGION_OPTIONS,
-  OWNER_OPTIONS,
-  CHANNEL_OPTIONS,
-  LEGEND_STATUSES,
-  STATUS_META,
-} from '../data/options'
+import { useOptions } from '../composables/useOptions'
+import { LEGEND_STATUSES, STATUS_META } from '../data/options'
 import type { CampaignStatus } from '../types'
 
 const { filters, viewMode, campaigns } = useCampaigns()
 const { profile } = useAuth()
+const { sbus, brands, regionOptions: regionCanonical, owners, channels: channelCanonical } = useOptions()
 const statusLabel = (s: CampaignStatus) => STATUS_META[s].label
 
 /** Order a set of values by the canonical list, appending any strays. */
@@ -38,16 +32,16 @@ function scoped(accountScope: string[] | undefined, present: string[], canonical
 }
 
 const sbuOptions = computed(() =>
-  scoped(profile.value?.sbus, campaigns.value.map((c) => c.sbu), SBU_OPTIONS),
+  scoped(profile.value?.sbus, campaigns.value.map((c) => c.sbu), sbus.value),
 )
 const brandOptions = computed(() =>
-  scoped(profile.value?.brands, campaigns.value.map((c) => c.brand), BRAND_OPTIONS),
+  scoped(profile.value?.brands, campaigns.value.map((c) => c.brand), brands.value),
 )
 const regionOptions = computed(() =>
-  scoped(profile.value?.regions, campaigns.value.flatMap((c) => c.regions), REGION_OPTIONS),
+  scoped(profile.value?.regions, campaigns.value.flatMap((c) => c.regions), regionCanonical.value),
 )
-const ownerOptions = computed(() => order(campaigns.value.map((c) => c.owner), OWNER_OPTIONS))
-const channelOptions = computed(() => order(campaigns.value.flatMap((c) => c.channels), CHANNEL_OPTIONS))
+const ownerOptions = computed(() => order(campaigns.value.map((c) => c.owner), owners.value))
+const channelOptions = computed(() => order(campaigns.value.flatMap((c) => c.channels), channelCanonical.value))
 </script>
 
 <template>

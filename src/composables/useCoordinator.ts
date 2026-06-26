@@ -1,7 +1,8 @@
 import { computed, reactive } from 'vue'
 import type { Campaign, DevOpsTicket, TicketSla, TicketStage } from '../types'
 import { useCampaigns } from './useCampaigns'
-import { OWNER_OPTIONS, TODAY } from '../data/options'
+import { useOptions } from './useOptions'
+import { TODAY } from '../data/options'
 import {
   generateTickets,
   STAGE_DOT,
@@ -249,7 +250,8 @@ function campaignName(id: string): string {
   return campaigns.value.find((c) => c.id === id)?.name ?? id
 }
 
-export const ASSIGNEE_OPTIONS = [...OWNER_OPTIONS, 'Unassigned']
+/** Owner list + "Unassigned" — reactive over the admin-managed owner values. */
+export const ASSIGNEE_OPTIONS = useOptions().assignees
 
 // ---- actions -------------------------------------------------------------
 

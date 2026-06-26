@@ -9,26 +9,19 @@ import FileUpload from './FileUpload.vue'
 import TrackingPixelsEditor from './TrackingPixelsEditor.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
+import { useOptions } from '../composables/useOptions'
 import { useAuth } from '../composables/useAuth'
 import { useCompletion, assetComplete, type SectionStatus } from '../composables/useCompletion'
-import {
-  SBU_OPTIONS,
-  BRAND_OPTIONS,
-  TYPE_OPTIONS,
-  PRIORITY_OPTIONS,
-  LANGUAGE_OPTIONS,
-  REGION_OPTIONS,
-  COUNTRY_OPTIONS,
-  WEBSITE_OPTIONS,
-  CHANNEL_OPTIONS,
-  OWNER_OPTIONS,
-  EMAIL_PROGRAM_OPTIONS,
-  STATUS_META,
-} from '../data/options'
+import { STATUS_META } from '../data/options'
 import type { CampaignStatus } from '../types'
 
 const router = useRouter()
 const { selected, drawerOpen, closeDrawer, openBrief, touchSelected } = useCampaigns()
+// Admin-managed dropdown lists (reactive — auto-update when an admin edits them).
+const {
+  sbus, brands, campaignTypes, priorities, languages,
+  websites, channels, owners, emailPrograms, regionOptions, countryOptions,
+} = useOptions()
 // Owners are locked to their own SBU + country (preselected on create).
 const { isOwner } = useAuth()
 const { ticketsFor } = useCoordinator()
@@ -146,43 +139,43 @@ const check = 'i-lucide-check'
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">SBU <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.sbu" :items="SBU_OPTIONS" placeholder="Select SBU" class="w-full"
+                <USelect v-model="selected.sbu" :items="sbus" placeholder="Select SBU" class="w-full"
                   :disabled="isOwner" @update:model-value="onChange" />
               </div>
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Country <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.country" :items="COUNTRY_OPTIONS" placeholder="Select country" class="w-full"
+                <USelect v-model="selected.country" :items="countryOptions" placeholder="Select country" class="w-full"
                   :disabled="isOwner" @update:model-value="onChange" />
               </div>
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Brand <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.brand" :items="BRAND_OPTIONS" class="w-full"
+                <USelect v-model="selected.brand" :items="brands" class="w-full"
                   @update:model-value="onChange" />
               </div>
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Website <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.website" :items="WEBSITE_OPTIONS" placeholder="Select website" class="w-full"
+                <USelect v-model="selected.website" :items="websites" placeholder="Select website" class="w-full"
                   @update:model-value="onChange" />
               </div>
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Campaign type <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.campaignType" :items="TYPE_OPTIONS" placeholder="Select type" class="w-full"
+                <USelect v-model="selected.campaignType" :items="campaignTypes" placeholder="Select type" class="w-full"
                   @update:model-value="onChange" />
               </div>
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Priority <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.priority" :items="PRIORITY_OPTIONS" placeholder="Select priority"
+                <USelect v-model="selected.priority" :items="priorities" placeholder="Select priority"
                   class="w-full" @update:model-value="onChange" />
               </div>
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Language <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.language" :items="LANGUAGE_OPTIONS" placeholder="Select language"
+                <USelect v-model="selected.language" :items="languages" placeholder="Select language"
                   class="w-full" @update:model-value="onChange" />
               </div>
               <div>
@@ -225,13 +218,13 @@ const check = 'i-lucide-check'
             <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Region(s) / countries <span
                   class="text-red-500">*</span></label>
-              <TagMultiSelect v-model="selected.regions" :options="REGION_OPTIONS" placeholder="Add regions"
+              <TagMultiSelect v-model="selected.regions" :options="regionOptions" placeholder="Add regions"
                 @update:model-value="onChange" />
             </div>
             <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Channels <span
                   class="text-red-500">*</span></label>
-              <TagMultiSelect v-model="selected.channels" :options="CHANNEL_OPTIONS" placeholder="Select channels"
+              <TagMultiSelect v-model="selected.channels" :options="channels" placeholder="Select channels"
                 @update:model-value="onChange" />
             </div>
           </section>
@@ -268,7 +261,7 @@ const check = 'i-lucide-check'
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Owner <span
                     class="text-red-500">*</span></label>
-                <USelect v-model="selected.owner" :items="OWNER_OPTIONS" placeholder="Select owner" class="w-full"
+                <USelect v-model="selected.owner" :items="owners" placeholder="Select owner" class="w-full"
                   @update:model-value="onChange" />
               </div>
               <div>
@@ -305,7 +298,7 @@ const check = 'i-lucide-check'
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Which program do you need to create?
                   <span class="text-red-500">*</span></label>
-                <USelect v-model="selected.assets.emails.program" :items="EMAIL_PROGRAM_OPTIONS"
+                <USelect v-model="selected.assets.emails.program" :items="emailPrograms"
                   placeholder="Select program" class="w-full" @update:model-value="onChange" />
               </div>
               <div>
@@ -364,7 +357,7 @@ const check = 'i-lucide-check'
               @update:selected="(v) => { selected!.assets.localization.selected = v; onChange() }">
               <div>
                 <label class="mb-1 block text-[13px] font-medium text-gray-500">Languages</label>
-                <TagMultiSelect v-model="selected.assets.localization.languages" :options="LANGUAGE_OPTIONS"
+                <TagMultiSelect v-model="selected.assets.localization.languages" :options="languages"
                   placeholder="Add languages" @update:model-value="onChange" />
               </div>
             </AssetCard>

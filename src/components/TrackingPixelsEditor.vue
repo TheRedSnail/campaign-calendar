@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import FileUpload from './FileUpload.vue'
 import { blankPixel } from '../data/campaigns'
-import { PIXEL_VENDOR_OPTIONS, PIXEL_TYPE_OPTIONS } from '../data/options'
+import { PIXEL_TYPE_OPTIONS } from '../data/options'
+import { useOptions } from '../composables/useOptions'
 import type { TrackingPixel } from '../types'
+
+const { pixelVendors } = useOptions()
 
 // Edits mutate the (reactive) pixel objects in place; `change` tells the parent to persist.
 const props = defineProps<{ modelValue: TrackingPixel[] }>()
@@ -51,7 +54,7 @@ const onChange = () => emit('change')
       <div class="grid grid-cols-2 gap-2.5">
         <div>
           <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel vendor <span class="text-red-500">*</span></label>
-          <USelect v-model="pixel.vendor" :items="PIXEL_VENDOR_OPTIONS" placeholder="Select vendor" class="w-full" @update:model-value="onChange" />
+          <USelect v-model="pixel.vendor" :items="pixelVendors" placeholder="Select vendor" class="w-full" @update:model-value="onChange" />
         </div>
         <div>
           <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel type <span class="text-red-500">*</span></label>
