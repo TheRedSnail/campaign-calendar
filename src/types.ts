@@ -4,6 +4,8 @@ export type CampaignStatus =
   | 'ready'
   | 'briefed'
   | 'in_production'
+  | 'live'
+  | 'ended'
 
 export type Brand = 'Next Henkel Adhesives' | 'Bekron' | 'Fester' | 'OSI'
 

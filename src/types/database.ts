@@ -216,32 +216,38 @@ export type Database = {
       }
       profiles: {
         Row: {
+          brands: string[]
           countries: string[]
           created_at: string
           email: string
           full_name: string
           id: string
           is_global: boolean
+          regions: string[]
           role: Database["public"]["Enums"]["app_role"]
           sbus: string[]
         }
         Insert: {
+          brands?: string[]
           countries?: string[]
           created_at?: string
           email: string
           full_name?: string
           id: string
           is_global?: boolean
+          regions?: string[]
           role?: Database["public"]["Enums"]["app_role"]
           sbus?: string[]
         }
         Update: {
+          brands?: string[]
           countries?: string[]
           created_at?: string
           email?: string
           full_name?: string
           id?: string
           is_global?: boolean
+          regions?: string[]
           role?: Database["public"]["Enums"]["app_role"]
           sbus?: string[]
         }
@@ -256,8 +262,10 @@ export type Database = {
         Args: { p_campaign_id: string; p_tickets: Json }
         Returns: undefined
       }
+      auth_brands: { Args: never; Returns: string[] }
       auth_countries: { Args: never; Returns: string[] }
       auth_is_global: { Args: never; Returns: boolean }
+      auth_regions: { Args: never; Returns: string[] }
       auth_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
@@ -276,6 +284,8 @@ export type Database = {
         | "ready"
         | "briefed"
         | "in_production"
+        | "live"
+        | "ended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -410,6 +420,8 @@ export const Constants = {
         "ready",
         "briefed",
         "in_production",
+        "live",
+        "ended",
       ],
     },
   },

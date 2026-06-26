@@ -238,7 +238,9 @@ export const STATUS_META: Record<CampaignStatus, StatusMeta> = {
   ready: { label: 'Ready', bg: 'bg-green-600', text: 'text-white', dot: 'bg-green-600', hex: '#175641' },
   briefed: { label: 'Briefed', bg: 'bg-blue-600', text: 'text-white', dot: 'bg-blue-600', hex: '#245E6F' },
   in_production: { label: 'In production', bg: 'bg-blue-600', text: 'text-white', dot: 'bg-blue-600', hex: '#245E6F' },
+  live: { label: 'Live', bg: 'bg-green-500', text: 'text-white', dot: 'bg-green-500', hex: '#1D7A55' },
+  ended: { label: 'Ended', bg: 'bg-gray-700', text: 'text-white', dot: 'bg-gray-700', hex: '#4D3938' },
 }
 
 /** Statuses shown in the calendar legend (order matters). */
-export const LEGEND_STATUSES: CampaignStatus[] = ['draft', 'in_progress', 'ready', 'briefed']
+export const LEGEND_STATUSES: CampaignStatus[] = ['draft', 'in_progress', 'ready', 'briefed', 'live', 'ended']
