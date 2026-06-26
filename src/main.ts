@@ -39,9 +39,9 @@ const router = createRouter({
     { path: '/', name: 'calendar', component: CalendarView },
     { path: '/campaign/:id/production', name: 'production', component: ProductionView },
     { path: '/config', name: 'config', component: ConfigView, meta: { roles: ['admin'] satisfies AppRole[] } },
+    { path: '/config/options', name: 'config-options', component: AdminOptionsView, meta: { roles: ['admin'] satisfies AppRole[] } },
+    { path: '/config/regions', name: 'config-regions', component: AdminRegionsView, meta: { roles: ['admin'] satisfies AppRole[] } },
     { path: '/admin', name: 'admin', component: AdminView, meta: { roles: ['admin'] satisfies AppRole[] } },
-    { path: '/admin/options', name: 'admin-options', component: AdminOptionsView, meta: { roles: ['admin'] satisfies AppRole[] } },
-    { path: '/admin/regions', name: 'admin-regions', component: AdminRegionsView, meta: { roles: ['admin'] satisfies AppRole[] } },
     {
       path: '/coordinator',
       component: CoordinatorLayout,

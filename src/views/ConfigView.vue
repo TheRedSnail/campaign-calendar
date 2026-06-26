@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useTimelineConfig } from '../composables/useTimelineConfig'
 import type { TimelinePhase } from '../data/timelineConfig'
 import { UAT_LABEL } from '../data/timelineConfig'
+import SettingsShell from '../components/SettingsShell.vue'
 
-const router = useRouter()
 const { phases, totalDays, setPhaseDays, resetToDefaults } = useTimelineConfig()
 
 // Phase → accent (reuses the calendar status tokens; no new hex values).
@@ -26,31 +25,11 @@ const segments = computed(() =>
 function onDays(key: TimelinePhase['key'], v: string | number) {
   setPhaseDays(key, Number(v))
 }
-
-function back() {
-  router.push({ name: 'calendar' })
-}
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <header class="flex items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 py-3">
-      <div class="flex items-center gap-3">
-        <button
-          type="button"
-          class="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-gray-700"
-          @click="back"
-        >
-          <UIcon name="i-lucide-chevron-left" class="size-4" />
-          Calendar
-        </button>
-        <span class="h-5 w-px bg-gray-200" />
-        <div>
-          <h1 class="text-base font-semibold text-gray-900">Settings</h1>
-          <p class="text-xs text-gray-400">Default production-timeline durations</p>
-        </div>
-      </div>
+  <SettingsShell>
+    <template #actions>
       <UButton
         label="Reset to defaults"
         icon="i-lucide-rotate-ccw"
@@ -59,9 +38,14 @@ function back() {
         size="sm"
         @click="resetToDefaults"
       />
-    </header>
+    </template>
 
-    <main class="mx-auto flex max-w-2xl flex-col gap-4 p-6">
+    <div class="mx-auto flex max-w-2xl flex-col gap-4">
+      <div>
+        <h1 class="text-xl font-semibold text-gray-900">Production timeline</h1>
+        <p class="text-sm text-gray-500">Default production-timeline durations (business days).</p>
+      </div>
+
       <!-- Phase durations -->
       <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
         <div class="mb-1 flex items-start justify-between">
@@ -136,6 +120,6 @@ function back() {
       <p class="px-1 text-xs text-gray-400">
         Changes apply to every campaign's production timeline and are saved to this browser.
       </p>
-    </main>
-  </div>
+    </div>
+  </SettingsShell>
 </template>

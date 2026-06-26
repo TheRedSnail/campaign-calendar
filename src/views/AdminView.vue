@@ -7,7 +7,6 @@ import { useOptions } from '../composables/useOptions'
 import { ROLE_LABELS } from '../data/options'
 import type { AppRole } from '../types/database'
 import TagMultiSelect from '../components/TagMultiSelect.vue'
-import AdminTabs from '../components/AdminTabs.vue'
 
 const router = useRouter()
 const { listUsers, createUser, updateUser, resetPassword, deleteUser } = useAdmin()
@@ -125,9 +124,12 @@ function scopeLabel(u: Profile): string {
     <header class="flex h-16 shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-6">
       <div class="flex items-center gap-2">
         <img src="/henkel-logo.png" alt="Henkel" class="h-12 w-auto" />
-        <span class="text-base font-semibold tracking-wide text-gray-900">Admin settings</span>
+        <span class="text-base font-semibold tracking-wide text-gray-900">User management</span>
       </div>
-      <AdminTabs />
+      <nav class="flex items-center gap-1 pl-3">
+        <RouterLink to="/" class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-50">Calendar</RouterLink>
+        <span class="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600">Users</span>
+      </nav>
       <div class="flex-1" />
       <span class="text-sm font-medium text-gray-500">{{ displayName }}</span>
       <UButton icon="i-lucide-log-out" color="neutral" variant="ghost" size="sm" aria-label="Sign out" @click="onLogout" />
