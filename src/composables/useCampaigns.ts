@@ -223,7 +223,6 @@ async function briefCampaign() {
       color: "success",
     })
   }
-
   const prev = {
     status: c.status,
     progress: c.progress,
@@ -232,8 +231,9 @@ async function briefCampaign() {
   };
   c.status = "briefed";
   c.progress = 100;
-  c.briefId = azure_data.id;
+  c.briefId = `ADH-${state.nextBriefSeq++}`;
   c.briefedAt = nowLabel();
+  c.devopsId = azure_data.id;
 
   const { error } = await supabase
     .from("campaigns")
@@ -246,11 +246,12 @@ async function briefCampaign() {
     .eq("id", c.id);
 
 
-  if (error || azure_error) {
-    Object.assign(c, prev); // rollback
-    state.nextBriefSeq--;
-    console.error("briefCampaign", error);
-  }
+}
+if (error || azure_error) {
+  Object.assign(c, prev); // rollback
+  state.nextBriefSeq--;
+  console.error("briefCampaign", error);
+}
 }
 
 export function useCampaigns() {
