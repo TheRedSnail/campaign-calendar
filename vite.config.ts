@@ -13,6 +13,7 @@ export default defineConfig({
           neutral: 'gray',
         },
       },
+      colorMode: false
     }),
   ],
 })

@@ -110,3 +110,31 @@ export function ticketToRow(t: DevOpsTicket): TicketInsert {
     due_date: t.dueDate,
   }
 }
+
+export function campaignToAzure(c: Campaign) {
+
+  return {
+    cam_name: c.name,
+    sbu: c.sbu, // from sbus
+    brand: c.brand, // from websites
+    cam_type: c.campaignType,
+    priority: c.priority,
+    language: c.language,
+    cost_center: c.costCenter,
+    start_date: c.startDate, //date
+    end_date: c.endDate, //date
+    region: c.regions.join(),
+    channels: c.regions.join(),
+    goal: c.goal,
+    cta: c.cta,
+    owner: c.owner, //user name
+    owner_email: c.ownerEmail,// user email
+    files: [],
+    "briefing_email": c.assets.emailBriefing.selected,
+    "briefing_form": c.assets.forms.selected,
+    "briefing_translation": c.assets.localization.selected,
+    "briefing_website": c.assets.landingPages.selected,
+    "briefing_tracking": c.assets.trackingPixels.selected,
+    notes: c.notes // passed into desription
+  }
+}
