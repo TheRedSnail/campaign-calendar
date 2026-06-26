@@ -1,6 +1,6 @@
-import type { Campaign, CampaignAssets, DevOpsTicket, Recipient, TicketSla, TicketStage } from '../types'
+import type { Campaign, DevOpsTicket, Recipient, TicketSla, TicketStage } from '../types'
 import type { Database } from '../types/database'
-import { emptyAssets } from './campaigns'
+import { normalizeAssets } from './campaigns'
 
 type CampaignRow = Database['public']['Tables']['campaigns']['Row']
 type CampaignInsert = Database['public']['Tables']['campaigns']['Insert']
@@ -38,7 +38,7 @@ export function rowToCampaign(row: CampaignRow): Campaign {
     watchers: row.watchers ?? [],
     coordinator: row.coordinator ?? undefined,
     notes: str(row.notes),
-    assets: (row.assets as unknown as CampaignAssets) ?? emptyAssets(),
+    assets: normalizeAssets(row.assets),
     recipients: (row.recipients as unknown as Recipient[]) ?? [],
     briefId: row.brief_id ?? undefined,
     briefedAt: row.briefed_at ?? undefined,
