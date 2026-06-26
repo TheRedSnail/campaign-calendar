@@ -8,12 +8,19 @@ import BriefModal from '../components/BriefModal.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { supabase } from '../lib/supabase'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const { viewMode, campaigns } = useCampaigns()
 
 watch(campaigns, (vals) => console.log(vals))
 
-let channel = null
+// Shape of the devops_webhook_events row fields this view reads off a realtime change.
+interface WebhookEventRow {
+  work_item_id: number
+  payload: { resource: { revision: { fields: Record<string, string> } } }
+}
+
+let channel: RealtimeChannel | null = null
 const changes = ref(null)
 onMounted(() => {
   channel = supabase.channel('custom-all-channel')
@@ -21,9 +28,10 @@ onMounted(() => {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'devops_webhook_events' },
       (payload) => {
-        const idx = campaigns.value.findIndex(c => c.devopsId == payload.new.work_item_id)
-        console.log(payload.new)
-        const { fields } = payload.new.payload.resource.revision
+        const row = payload.new as WebhookEventRow
+        const idx = campaigns.value.findIndex(c => c.devopsId == row.work_item_id)
+        console.log(row)
+        const { fields } = row.payload.resource.revision
         const campaign = campaigns.value[idx]
         console.log({ campaign, fields })
         campaigns.value[idx] = {
