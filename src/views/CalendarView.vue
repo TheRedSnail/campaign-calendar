@@ -16,6 +16,7 @@ watch(campaigns, (vals) => console.log(vals))
 let channel = null
 const changes = ref(null)
 onMounted(() => {
+  console.log(campaigns.value)
   channel = supabase.channel('custom-all-channel')
     .on(
       'postgres_changes',
@@ -36,8 +37,8 @@ onMounted(() => {
           costCenter: fields['Custom.CostCenter'],
           language: fields['Custom.Language'],
           ownerEmail: fields['Custom.Primarycontact'],
-          startDate: fields['Microsoft.VSTS.Scheduling.StartDate'],
-          endDate: fields['Microsoft.VSTS.Scheduling.TargetDate']
+          startDate: fields['Microsoft.VSTS.Scheduling.StartDate'].split('T')[0],
+          endDate: fields['Microsoft.VSTS.Scheduling.TargetDate'].split('T')[0]
         }
       }
     )
