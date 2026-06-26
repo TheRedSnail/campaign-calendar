@@ -35,7 +35,9 @@ onMounted(() => {
           campaignType: fields['Custom.Campaigntype'],
           costCenter: fields['Custom.CostCenter'],
           language: fields['Custom.Language'],
-          ownerEmail: fields['Custom.Primarycontact']
+          ownerEmail: fields['Custom.Primarycontact'],
+          startDate: fields['Microsoft.VSTS.Scheduling.StartDate'],
+          endDate: fields['Microsoft.VSTS.Scheduling.TargetDate']
         }
       }
     )
