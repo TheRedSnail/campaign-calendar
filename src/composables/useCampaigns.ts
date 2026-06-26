@@ -242,16 +242,15 @@ async function briefCampaign() {
       progress: c.progress,
       brief_id: c.briefId,
       briefed_at: c.briefedAt,
+      devops_id: c.devopsId
     })
     .eq("id", c.id);
 
-
-}
-if (error || azure_error) {
-  Object.assign(c, prev); // rollback
-  state.nextBriefSeq--;
-  console.error("briefCampaign", error);
-}
+  if (error || azure_error) {
+    Object.assign(c, prev); // rollback
+    state.nextBriefSeq--;
+    console.error("briefCampaign", error);
+  }
 }
 
 export function useCampaigns() {
