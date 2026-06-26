@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
-import { buildMonthCells, buildMonthBars, WEEKDAYS, type MonthBar } from '../utils/dates'
+import { buildMonthCells, buildMonthBars, WEEKDAYS, type MonthBar, type DayCell } from '../utils/dates'
 import { TODAY, STATUS_META } from '../data/options'
 import type { Campaign } from '../types'
 
@@ -20,6 +20,13 @@ const bars = computed(() => buildMonthBars(cells.value, filtered.value))
 const COL = 100 / 7
 const LANE_H = 22
 const TOP_OFFSET = 30
+
+/** Day-cell background: today highlighted, weekends tinted, out-of-month muted. */
+function cellBg(cell: DayCell) {
+  if (cell.isToday) return 'bg-red-50'
+  if (cell.isWeekend) return cell.inMonth ? 'bg-gray-100/70' : 'bg-gray-100'
+  return cell.inMonth ? 'bg-white' : 'bg-gray-50/60'
+}
 
 function barStyle(bar: MonthBar) {
   return {
@@ -55,12 +62,17 @@ function barStyle(bar: MonthBar) {
           <div
             v-for="cell in week"
             :key="cell.iso"
-            class="border-r border-gray-100 p-2 last:border-r-0"
-            :class="cell.inMonth ? 'bg-white' : 'bg-gray-50/60'"
+            class="relative border-r border-gray-100 p-2 last:border-r-0"
+            :class="cellBg(cell)"
           >
             <span
               v-if="cell.isToday"
-              class="flex size-6 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white"
+              class="absolute inset-0 ring-2 ring-inset ring-red-500/70"
+              aria-hidden="true"
+            />
+            <span
+              v-if="cell.isToday"
+              class="relative flex size-6 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white"
             >
               {{ cell.day }}
             </span>

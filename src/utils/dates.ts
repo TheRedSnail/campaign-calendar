@@ -39,6 +39,7 @@ export interface DayCell {
   day: number
   inMonth: boolean
   isToday: boolean
+  isWeekend: boolean
 }
 
 /** Build a Monday-first month matrix covering the given month. */
@@ -54,11 +55,13 @@ export function buildMonthCells(monthISO: string, todayISO: string): DayCell[] {
   for (let i = 0; i < 35; i++) {
     const d = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i)
     const iso = toISO(d)
+    const dow = d.getDay()
     cells.push({
       iso,
       day: d.getDate(),
       inMonth: d.getMonth() === month,
       isToday: iso === todayISO,
+      isWeekend: dow === 0 || dow === 6,
     })
   }
   return cells
