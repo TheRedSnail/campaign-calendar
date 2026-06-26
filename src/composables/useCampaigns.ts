@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabase";
 import { campaignToAzure, campaignToRow, rowToCampaign } from "../data/mappers";
 import { useAuth } from "./useAuth";
 import { createAzureTicket } from "../utils/azure/create";
+import { useToast } from "@nuxt/ui/composables/useToast.js";
 
 export type ViewMode = "month" | "timeline";
 
