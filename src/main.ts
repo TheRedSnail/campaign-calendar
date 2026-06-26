@@ -58,10 +58,10 @@ const router = createRouter({
 // of a deep route doesn't race auth (which would render an empty, RLS-scoped-to-nothing page).
 router.beforeEach(async (to) => {
   await initAuth()
-  const { session, profile } = useAuth()
+  const { session, profile, landingPath } = useAuth()
 
   if (to.meta.public) {
-    return session.value ? { path: '/' } : true
+    return session.value ? { path: landingPath.value } : true
   }
   if (!session.value) {
     return { name: 'login', query: { redirect: to.fullPath } }

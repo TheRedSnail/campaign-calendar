@@ -20,6 +20,18 @@ export const STAGE_DOT: Record<TicketStage, ProgressDot> = {
 
 export const SLA_LIST: TicketSla[] = ['On track', 'At risk', 'Overdue']
 
+/** Azure DevOps project the campaign work items live in (see the Logic App integration). */
+export const DEVOPS_PROJECT_URL = 'https://dev.azure.com/henkeldx/Webstudio%20Bratislava'
+
+/**
+ * Deep-link to a ticket's Azure DevOps work item. Once the DevOps writeback has run we hold the
+ * exact edit URL (`devopsUrl`, e.g. …/_workitems/edit/727980); until then — and for demo tickets
+ * with no real work item yet — fall back to a work-item search for our ticket id in the project.
+ */
+export function devopsTicketUrl(t: DevOpsTicket): string {
+  return t.devopsUrl || `${DEVOPS_PROJECT_URL}/_workitems/?text=${encodeURIComponent(t.id)}`
+}
+
 /** Channel → operational team. Drives the DevOps ticket fan-out. */
 export const CHANNEL_TEAM: Record<string, string> = {
   Email: 'CRM / Email',
