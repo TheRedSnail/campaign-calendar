@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 
-// Sub-navigation shared by the three admin screens (Users / Dropdown values / Regions).
+// Sub-navigation shared by the admin Settings screens.
 const route = useRoute()
 const tabs = [
-  { to: '/admin', label: 'Users' },
-  { to: '/admin/options', label: 'Dropdown values' },
-  { to: '/admin/regions', label: 'Regions & countries' },
+  { to: '/config', label: 'Production timeline' },
+  { to: '/config/options', label: 'Dropdown values' },
+  { to: '/config/regions', label: 'Regions & countries' },
 ]
 </script>
 

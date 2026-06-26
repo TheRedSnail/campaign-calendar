@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import AdminShell from '../components/AdminShell.vue'
+import SettingsShell from '../components/SettingsShell.vue'
 import { useOptions } from '../composables/useOptions'
 import { useOptionsAdmin } from '../composables/useOptionsAdmin'
 
@@ -100,7 +100,7 @@ async function saveCountry() {
 </script>
 
 <template>
-  <AdminShell title="Admin settings">
+  <SettingsShell>
     <div class="mb-5 flex items-start justify-between gap-4">
       <div>
         <h1 class="text-xl font-semibold text-gray-900">Regions &amp; countries</h1>
@@ -205,5 +205,5 @@ async function saveCountry() {
         </div>
       </template>
     </USlideover>
-  </AdminShell>
+  </SettingsShell>
 </template>

@@ -6,15 +6,22 @@ import TimelineGantt from '../components/TimelineGantt.vue'
 import CampaignDrawer from '../components/CampaignDrawer.vue'
 import BriefModal from '../components/BriefModal.vue'
 import { useCampaigns } from '../composables/useCampaigns'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { supabase } from '../lib/supabase'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const { viewMode, campaigns } = useCampaigns()
 
-watch(campaigns, (vals) => console.log(vals))
+// Shape of the devops_webhook_events row fields this view reads off a realtime change.
+interface WebhookEventRow {
+  work_item_id: number
+  payload: { resource: { revision: { fields: Record<string, string> } } }
+}
 
-let channel = null
-const changes = ref(null)
+/** Azure DevOps sends full ISO timestamps; the calendar works in yyyy-mm-dd. */
+const toDate = (v: string | undefined, fallback: string) => (v ? v.slice(0, 10) : fallback)
+
+let channel: RealtimeChannel | null = null
 onMounted(() => {
   console.log(campaigns.value)
   channel = supabase.channel('custom-all-channel')
@@ -22,11 +29,11 @@ onMounted(() => {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'devops_webhook_events' },
       (payload) => {
-        const idx = campaigns.value.findIndex(c => c.devopsId == payload.new.work_item_id)
-        console.log(payload.new)
-        const { fields } = payload.new.payload.resource.revision
+        const row = payload.new as WebhookEventRow
+        const idx = campaigns.value.findIndex(c => c.devopsId == row.work_item_id)
+        if (idx === -1) return // event for a campaign we don't have loaded — ignore
+        const { fields } = row.payload.resource.revision
         const campaign = campaigns.value[idx]
-        console.log({ campaign, fields })
         campaigns.value[idx] = {
           ...campaign,
           name: fields['System.Title'],
@@ -37,15 +44,13 @@ onMounted(() => {
           costCenter: fields['Custom.CostCenter'],
           language: fields['Custom.Language'],
           ownerEmail: fields['Custom.Primarycontact'],
-          startDate: fields['Microsoft.VSTS.Scheduling.StartDate'].split('T')[0],
-          endDate: fields['Microsoft.VSTS.Scheduling.TargetDate'].split('T')[0]
+          startDate: toDate(fields['Microsoft.VSTS.Scheduling.StartDate'], campaign.startDate),
+          endDate: toDate(fields['Microsoft.VSTS.Scheduling.TargetDate'], campaign.endDate)
         }
       }
     )
     .subscribe()
 })
-
-watch(changes, (values) => console.log(values))
 
 onUnmounted(() => {
   if (channel) {

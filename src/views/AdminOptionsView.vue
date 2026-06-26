@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import AdminShell from '../components/AdminShell.vue'
+import SettingsShell from '../components/SettingsShell.vue'
 import { useOptions, OPTION_KINDS, type OptionKind } from '../composables/useOptions'
 import { useOptionsAdmin } from '../composables/useOptionsAdmin'
 
@@ -59,7 +59,7 @@ async function toggleActive(row: { value: string; active: boolean }) {
 </script>
 
 <template>
-  <AdminShell title="Admin settings">
+  <SettingsShell>
     <div class="mb-5">
       <h1 class="text-xl font-semibold text-gray-900">Dropdown values</h1>
       <p class="text-sm text-gray-500">
@@ -150,5 +150,5 @@ async function toggleActive(row: { value: string; active: boolean }) {
         </div>
       </template>
     </USlideover>
-  </AdminShell>
+  </SettingsShell>
 </template>
