@@ -2,12 +2,14 @@
 import { computed } from 'vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
-import { BRAND_OPTIONS, STATUS_META, TODAY } from '../data/options'
+import { useOptions } from '../composables/useOptions'
+import { STATUS_META, TODAY } from '../data/options'
 import { buildTimelineWeeks, shortDate, timelineBar, timelineFraction } from '../utils/dates'
 import type { Brand, Campaign } from '../types'
 
 const { filtered, openDrawer } = useCampaigns()
 const { campaignProgress } = useCoordinator()
+const { brands } = useOptions()
 
 /** In-flight campaigns show live ticket-derived progress; others use brief completion. */
 const displayProgress = (c: Campaign) =>
@@ -18,7 +20,7 @@ const weeks = buildTimelineWeeks()
 const todayLeft = computed(() => timelineFraction(TODAY) * 100)
 
 const groups = computed(() =>
-  BRAND_OPTIONS.map((brand: Brand) => ({
+  brands.value.map((brand: Brand) => ({
     brand,
     campaigns: filtered.value.filter((c) => c.brand === brand),
   })).filter((g) => g.campaigns.length > 0),

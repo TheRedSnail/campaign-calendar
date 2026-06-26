@@ -3,13 +3,17 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAdmin } from '../composables/useAdmin'
 import { useAuth, type Profile } from '../composables/useAuth'
-import { ROLE_LABELS, SBU_OPTIONS, COUNTRY_OPTIONS, BRAND_OPTIONS, REGION_OPTIONS } from '../data/options'
+import { useOptions } from '../composables/useOptions'
+import { ROLE_LABELS } from '../data/options'
 import type { AppRole } from '../types/database'
 import TagMultiSelect from '../components/TagMultiSelect.vue'
+import AdminTabs from '../components/AdminTabs.vue'
 
 const router = useRouter()
 const { listUsers, createUser, updateUser, resetPassword, deleteUser } = useAdmin()
 const { logout, displayName } = useAuth()
+// Scope pickers draw from the admin-managed option lists (sbus / countries / brands / regions).
+const { sbus: sbuOptions, countryOptions, brands: brandOptions, regionOptions } = useOptions()
 
 async function onLogout() {
   await logout()
@@ -121,12 +125,9 @@ function scopeLabel(u: Profile): string {
     <header class="flex h-16 shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-6">
       <div class="flex items-center gap-2">
         <img src="/henkel-logo.png" alt="Henkel" class="h-12 w-auto" />
-        <span class="text-base font-semibold tracking-wide text-gray-900">User management</span>
+        <span class="text-base font-semibold tracking-wide text-gray-900">Admin settings</span>
       </div>
-      <nav class="flex items-center gap-1 pl-3">
-        <RouterLink to="/" class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-50">Calendar</RouterLink>
-        <span class="rounded-lg bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600">Admin</span>
-      </nav>
+      <AdminTabs />
       <div class="flex-1" />
       <span class="text-sm font-medium text-gray-500">{{ displayName }}</span>
       <UButton icon="i-lucide-log-out" color="neutral" variant="ghost" size="sm" aria-label="Sign out" @click="onLogout" />
@@ -194,12 +195,12 @@ function scopeLabel(u: Profile): string {
             <label class="mb-1 block text-[13px] font-medium text-gray-500">
               {{ form.role === 'campaign_owner' ? 'SBU (assign one)' : 'SBUs (one or more)' }}
             </label>
-            <TagMultiSelect v-model="form.sbus" :options="SBU_OPTIONS" placeholder="Add SBU" />
+            <TagMultiSelect v-model="form.sbus" :options="sbuOptions" placeholder="Add SBU" />
           </div>
 
           <div v-if="form.role === 'campaign_owner'">
             <label class="mb-1 block text-[13px] font-medium text-gray-500">Country (assign one)</label>
-            <TagMultiSelect v-model="form.countries" :options="COUNTRY_OPTIONS" placeholder="Add country" />
+            <TagMultiSelect v-model="form.countries" :options="countryOptions" placeholder="Add country" />
           </div>
 
           <template v-if="form.role === 'run_team'">
@@ -208,18 +209,18 @@ function scopeLabel(u: Profile): string {
             </label>
             <div v-if="!form.is_global">
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Countries (one or more)</label>
-              <TagMultiSelect v-model="form.countries" :options="COUNTRY_OPTIONS" placeholder="Add countries" />
+              <TagMultiSelect v-model="form.countries" :options="countryOptions" placeholder="Add countries" />
             </div>
           </template>
 
           <template v-if="form.role !== 'admin'">
             <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Brands <span class="font-normal text-gray-400">— leave empty for all</span></label>
-              <TagMultiSelect v-model="form.brands" :options="BRAND_OPTIONS" placeholder="Add brand" />
+              <TagMultiSelect v-model="form.brands" :options="brandOptions" placeholder="Add brand" />
             </div>
             <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Regions <span class="font-normal text-gray-400">— leave empty for all</span></label>
-              <TagMultiSelect v-model="form.regions" :options="REGION_OPTIONS" placeholder="Add region" />
+              <TagMultiSelect v-model="form.regions" :options="regionOptions" placeholder="Add region" />
             </div>
           </template>
 

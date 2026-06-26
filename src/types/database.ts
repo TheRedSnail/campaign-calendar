@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_options: {
+        Row: {
+          active: boolean
+          created_at: string
+          kind: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          kind: string
+          label?: string
+          sort_order?: number
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          kind?: string
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Relationships: []
+      }
       campaigns: {
         Row: {
           assets: Json
@@ -127,6 +154,41 @@ export type Database = {
           website?: string
         }
         Relationships: []
+      }
+      countries: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          region_id: string | null
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          region_id?: string | null
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          region_id?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "countries_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       devops_tickets: {
         Row: {
@@ -253,6 +315,30 @@ export type Database = {
         }
         Relationships: []
       }
+      regions: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -271,9 +357,15 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"]
       }
       auth_sbus: { Args: never; Returns: string[] }
+      auth_sees_all: { Args: never; Returns: boolean }
+      auth_visible_countries: { Args: never; Returns: string[] }
       can_see_campaign: {
         Args: { c_country: string; c_sbu: string }
         Returns: boolean
+      }
+      region_member_countries: {
+        Args: { region_names: string[] }
+        Returns: string[]
       }
     }
     Enums: {

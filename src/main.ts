@@ -16,6 +16,8 @@ import ProductionView from './views/ProductionView.vue'
 import ConfigView from './views/ConfigView.vue'
 import LoginView from './views/LoginView.vue'
 import AdminView from './views/AdminView.vue'
+import AdminOptionsView from './views/AdminOptionsView.vue'
+import AdminRegionsView from './views/AdminRegionsView.vue'
 import CoordinatorLayout from './views/coordinator/CoordinatorLayout.vue'
 import CoordDashboard from './views/coordinator/CoordDashboard.vue'
 import CoordTriage from './views/coordinator/CoordTriage.vue'
@@ -25,6 +27,7 @@ import CoordAnalytics from './views/coordinator/CoordAnalytics.vue'
 import CoordTickets from './views/coordinator/CoordTickets.vue'
 import CoordCockpit from './views/coordinator/CoordCockpit.vue'
 import { initAuth, useAuth } from './composables/useAuth'
+import { loadOptions } from './composables/useOptions'
 import type { AppRole } from './types/database'
 
 const COORD_ROLES: AppRole[] = ['campaign_coordinator', 'run_team', 'admin']
@@ -37,6 +40,8 @@ const router = createRouter({
     { path: '/campaign/:id/production', name: 'production', component: ProductionView },
     { path: '/config', name: 'config', component: ConfigView, meta: { roles: ['admin'] satisfies AppRole[] } },
     { path: '/admin', name: 'admin', component: AdminView, meta: { roles: ['admin'] satisfies AppRole[] } },
+    { path: '/admin/options', name: 'admin-options', component: AdminOptionsView, meta: { roles: ['admin'] satisfies AppRole[] } },
+    { path: '/admin/regions', name: 'admin-regions', component: AdminRegionsView, meta: { roles: ['admin'] satisfies AppRole[] } },
     {
       path: '/coordinator',
       component: CoordinatorLayout,
@@ -54,6 +59,11 @@ const router = createRouter({
   ],
 })
 
+// Admin-managed dropdown values + geography. Loaded once (lazily) on the first authenticated
+// navigation so every dropdown is populated before a view renders, even on a deep hard reload.
+let optionsReady: Promise<void> | null = null
+const ensureOptions = () => (optionsReady ??= loadOptions())
+
 // Await the initial session lookup before resolving the first navigation so a hard reload
 // of a deep route doesn't race auth (which would render an empty, RLS-scoped-to-nothing page).
 router.beforeEach(async (to) => {
@@ -66,6 +76,7 @@ router.beforeEach(async (to) => {
   if (!session.value) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
+  await ensureOptions()
   const roles = to.meta.roles as AppRole[] | undefined
   if (roles && !(profile.value && roles.includes(profile.value.role))) {
     return { path: '/' } // authenticated but not permitted → calendar
