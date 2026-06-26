@@ -3,7 +3,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAdmin } from '../composables/useAdmin'
 import { useAuth, type Profile } from '../composables/useAuth'
-import { ROLE_LABELS, SBU_OPTIONS, COUNTRY_OPTIONS } from '../data/options'
+import { ROLE_LABELS, SBU_OPTIONS, COUNTRY_OPTIONS, BRAND_OPTIONS, REGION_OPTIONS } from '../data/options'
 import type { AppRole } from '../types/database'
 import TagMultiSelect from '../components/TagMultiSelect.vue'
 
@@ -44,6 +44,8 @@ const form = reactive({
   role: 'campaign_owner' as AppRole,
   sbus: [] as string[],
   countries: [] as string[],
+  brands: [] as string[],
+  regions: [] as string[],
   is_global: false,
 })
 
@@ -52,7 +54,7 @@ function openCreate() {
   formError.value = ''
   Object.assign(form, {
     email: '', password: '', full_name: '', role: 'campaign_owner',
-    sbus: [], countries: [], is_global: false,
+    sbus: [], countries: [], brands: [], regions: [], is_global: false,
   })
   open.value = true
 }
@@ -62,7 +64,8 @@ function openEdit(u: Profile) {
   formError.value = ''
   Object.assign(form, {
     email: u.email, password: '', full_name: u.full_name, role: u.role,
-    sbus: [...u.sbus], countries: [...u.countries], is_global: u.is_global,
+    sbus: [...u.sbus], countries: [...u.countries],
+    brands: [...u.brands], regions: [...u.regions], is_global: u.is_global,
   })
   open.value = true
 }
@@ -74,7 +77,8 @@ async function save() {
   if (editingId.value) {
     res = await updateUser(editingId.value, {
       full_name: form.full_name, role: form.role,
-      sbus: form.sbus, countries: form.countries, is_global: form.is_global,
+      sbus: form.sbus, countries: form.countries,
+      brands: form.brands, regions: form.regions, is_global: form.is_global,
     })
     if (!res.error && form.password) {
       res = await resetPassword(editingId.value, form.password)
@@ -82,7 +86,8 @@ async function save() {
   } else {
     res = await createUser({
       email: form.email, password: form.password, full_name: form.full_name,
-      role: form.role, sbus: form.sbus, countries: form.countries, is_global: form.is_global,
+      role: form.role, sbus: form.sbus, countries: form.countries,
+      brands: form.brands, regions: form.regions, is_global: form.is_global,
     })
   }
   saving.value = false
@@ -204,6 +209,17 @@ function scopeLabel(u: Profile): string {
             <div v-if="!form.is_global">
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Countries (one or more)</label>
               <TagMultiSelect v-model="form.countries" :options="COUNTRY_OPTIONS" placeholder="Add countries" />
+            </div>
+          </template>
+
+          <template v-if="form.role !== 'admin'">
+            <div>
+              <label class="mb-1 block text-[13px] font-medium text-gray-500">Brands <span class="font-normal text-gray-400">— leave empty for all</span></label>
+              <TagMultiSelect v-model="form.brands" :options="BRAND_OPTIONS" placeholder="Add brand" />
+            </div>
+            <div>
+              <label class="mb-1 block text-[13px] font-medium text-gray-500">Regions <span class="font-normal text-gray-400">— leave empty for all</span></label>
+              <TagMultiSelect v-model="form.regions" :options="REGION_OPTIONS" placeholder="Add region" />
             </div>
           </template>
 

@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     const action = body.action as string;
 
     if (action === "create") {
-      const { email, password, full_name, role, sbus, countries, is_global } = body;
+      const { email, password, full_name, role, sbus, countries, brands, regions, is_global } = body;
       const { data: created, error } = await admin.auth.admin.createUser({
         email,
         password,
@@ -54,6 +54,8 @@ Deno.serve(async (req) => {
         role,
         sbus: sbus ?? [],
         countries: countries ?? [],
+        brands: brands ?? [],
+        regions: regions ?? [],
         is_global: is_global ?? false,
       });
       if (pErr) {
@@ -64,12 +66,14 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update") {
-      const { id, full_name, role, sbus, countries, is_global } = body;
+      const { id, full_name, role, sbus, countries, brands, regions, is_global } = body;
       const patch: Record<string, unknown> = {};
       if (full_name !== undefined) patch.full_name = full_name;
       if (role !== undefined) patch.role = role;
       if (sbus !== undefined) patch.sbus = sbus;
       if (countries !== undefined) patch.countries = countries;
+      if (brands !== undefined) patch.brands = brands;
+      if (regions !== undefined) patch.regions = regions;
       if (is_global !== undefined) patch.is_global = is_global;
       const { error } = await admin.from("profiles").update(patch).eq("id", id);
       if (error) return json({ error: error.message }, 400);

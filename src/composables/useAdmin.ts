@@ -9,6 +9,8 @@ export interface UserInput {
   role: AppRole
   sbus: string[]
   countries: string[]
+  brands: string[]
+  regions: string[]
   is_global: boolean
 }
 
