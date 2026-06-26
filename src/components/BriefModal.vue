@@ -23,7 +23,7 @@ const recipients = computed(() =>
 const assetList = computed(() => {
   const a = selected.value?.assets
   return [
-    { label: 'Email briefing', on: a?.emailBriefing.selected },
+    { label: 'Emails', on: a?.emails.selected },
     { label: 'Landing pages', on: a?.landingPages.selected },
     { label: 'Forms', on: a?.forms.selected },
     { label: 'Tracking pixels', on: a?.trackingPixels.selected },
@@ -61,6 +61,7 @@ const basics = computed<Row[]>(() => {
   return [
     { k: 'Brand', v: c.brand },
     { k: 'SBU', v: c.sbu },
+    { k: 'Website', v: c.website },
     { k: 'Type', v: c.campaignType },
     { k: 'Priority', v: c.priority },
     { k: 'Language', v: c.language },
@@ -172,6 +173,17 @@ const basics = computed<Row[]>(() => {
                 </span>
                 <span class="font-medium text-gray-800">{{ r.name }}</span>
                 <span v-if="r.role" class="text-gray-400">· {{ r.role }}</span>
+              </span>
+              <span
+                v-for="w in selected.watchers"
+                :key="w"
+                class="inline-flex items-center gap-2 rounded-full bg-gray-50 py-1 pl-1 pr-3 text-sm"
+              >
+                <span class="flex size-6 items-center justify-center rounded-full bg-gray-200 text-[11px] font-semibold text-gray-600">
+                  <UIcon name="i-lucide-eye" class="size-3" />
+                </span>
+                <span class="font-medium text-gray-800">{{ w }}</span>
+                <span class="text-gray-400">· CC</span>
               </span>
             </div>
           </div>

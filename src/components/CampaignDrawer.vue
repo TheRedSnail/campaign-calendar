@@ -3,8 +3,10 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import StatusBadge from './StatusBadge.vue'
 import TagMultiSelect from './TagMultiSelect.vue'
+import EmailTagInput from './EmailTagInput.vue'
 import AssetCard from './AssetCard.vue'
 import FileUpload from './FileUpload.vue'
+import TrackingPixelsEditor from './TrackingPixelsEditor.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
 import { useAuth } from '../composables/useAuth'
@@ -17,8 +19,10 @@ import {
   LANGUAGE_OPTIONS,
   REGION_OPTIONS,
   COUNTRY_OPTIONS,
+  WEBSITE_OPTIONS,
   CHANNEL_OPTIONS,
   OWNER_OPTIONS,
+  EMAIL_PROGRAM_OPTIONS,
   STATUS_META,
 } from '../data/options'
 import type { CampaignStatus } from '../types'
@@ -132,6 +136,10 @@ const check = 'i-lucide-check'
               <USelect v-model="selected.brand" :items="BRAND_OPTIONS" class="w-full" @update:model-value="onChange" />
             </div>
             <div>
+              <label class="mb-1 block text-[13px] font-medium text-gray-500">Website</label>
+              <USelect v-model="selected.website" :items="WEBSITE_OPTIONS" placeholder="Select website" class="w-full" @update:model-value="onChange" />
+            </div>
+            <div>
               <label class="mb-1 block text-[13px] font-medium text-gray-500">Campaign type</label>
               <USelect v-model="selected.campaignType" :items="TYPE_OPTIONS" placeholder="Select type" class="w-full"
                 @update:model-value="onChange" />
@@ -230,6 +238,11 @@ const check = 'i-lucide-check'
                 :trailing-icon="selected.ownerEmail ? check : undefined" @update:model-value="onChange" />
             </div>
           </div>
+          <div>
+            <label class="mb-1 block text-[13px] font-medium text-gray-500">CC watchers</label>
+            <EmailTagInput v-model="selected.watchers" placeholder="Add email + Enter" @update:model-value="onChange" />
+            <p class="mt-1 text-xs text-gray-400">People who stay in the loop — updated alongside the owner.</p>
+          </div>
         </section>
 
         <!-- Assets & briefings -->
@@ -243,18 +256,22 @@ const check = 'i-lucide-check'
             Select the assets &amp; briefings this campaign needs, then fill in each one.
           </p>
           <div class="flex flex-col gap-2">
-            <!-- Email briefing -->
-            <AssetCard label="Email briefing" :selected="selected.assets.emailBriefing.selected"
-              :complete="assetComplete('emailBriefing', selected.assets)"
-              @update:selected="(v) => { selected!.assets.emailBriefing.selected = v; onChange() }">
+            <!-- Emails -->
+            <AssetCard
+              label="Emails"
+              :selected="selected.assets.emails.selected"
+              :complete="assetComplete('emails', selected.assets)"
+              @update:selected="(v) => { selected!.assets.emails.selected = v; onChange() }"
+            >
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Key message — what's the email
-                  about?</label>
-                <UTextarea v-model="selected.assets.emailBriefing.brief" :rows="2"
-                  placeholder="e.g. Launch announcement to OEM accounts" class="w-full"
-                  @update:model-value="onChange" />
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Which program do you need to create?</label>
+                <USelect v-model="selected.assets.emails.program" :items="EMAIL_PROGRAM_OPTIONS" placeholder="Select program" class="w-full" @update:model-value="onChange" />
               </div>
-              <FileUpload v-model="selected.assets.emailBriefing.briefingDoc" @update:model-value="onChange" />
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Description</label>
+                <UTextarea v-model="selected.assets.emails.description" :rows="2" placeholder="Describe the email program" class="w-full" @update:model-value="onChange" />
+              </div>
+              <FileUpload v-model="selected.assets.emails.briefingDoc" @update:model-value="onChange" />
             </AssetCard>
 
             <!-- Landing pages -->
@@ -262,14 +279,12 @@ const check = 'i-lucide-check'
               :complete="assetComplete('landingPages', selected.assets)"
               @update:selected="(v) => { selected!.assets.landingPages.selected = v; onChange() }">
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Page goal / desired action</label>
-                <UInput v-model="selected.assets.landingPages.brief" placeholder="e.g. Drive demo sign-ups"
-                  class="w-full" @update:model-value="onChange" />
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Description (optional)</label>
+                <UTextarea v-model="selected.assets.landingPages.description" :rows="2" placeholder="What should the landing page do?" class="w-full" @update:model-value="onChange" />
               </div>
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Reference URL (optional)</label>
-                <UInput v-model="selected.assets.landingPages.reference" placeholder="henkel.com/lp" class="w-full"
-                  @update:model-value="onChange" />
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">External files / links</label>
+                <UInput v-model="selected.assets.landingPages.externalLinks" placeholder="WeTransfer / Drive link for large files" class="w-full" @update:model-value="onChange" />
               </div>
               <FileUpload v-model="selected.assets.landingPages.briefingDoc" @update:model-value="onChange" />
             </AssetCard>
@@ -279,10 +294,12 @@ const check = 'i-lucide-check'
               :complete="assetComplete('forms', selected.assets)"
               @update:selected="(v) => { selected!.assets.forms.selected = v; onChange() }">
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">What should the form capture?</label>
-                <UTextarea v-model="selected.assets.forms.brief" :rows="2"
-                  placeholder="e.g. Name, company, application & volume" class="w-full"
-                  @update:model-value="onChange" />
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">Description (optional)</label>
+                <UTextarea v-model="selected.assets.forms.description" :rows="2" placeholder="What should the form capture?" class="w-full" @update:model-value="onChange" />
+              </div>
+              <div>
+                <label class="mb-1 block text-[13px] font-medium text-gray-500">External files / links</label>
+                <UInput v-model="selected.assets.forms.externalLinks" placeholder="WeTransfer / Drive link for large files" class="w-full" @update:model-value="onChange" />
               </div>
               <FileUpload v-model="selected.assets.forms.briefingDoc" @update:model-value="onChange" />
             </AssetCard>
@@ -290,25 +307,10 @@ const check = 'i-lucide-check'
             <!-- Tracking pixels -->
             <AssetCard label="Tracking pixels" :selected="selected.assets.trackingPixels.selected"
               :complete="assetComplete('trackingPixels', selected.assets)"
-              @update:selected="(v) => { selected!.assets.trackingPixels.selected = v; onChange() }">
-              <p class="text-xs text-gray-400">Placeholder fields — to be finalised later (TBD).</p>
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="mb-1 block text-[13px] font-medium text-gray-500">Provider</label>
-                  <UInput v-model="selected.assets.trackingPixels.provider" placeholder="e.g. GA4" class="w-full"
-                    @update:model-value="onChange" />
-                </div>
-                <div>
-                  <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel ID</label>
-                  <UInput v-model="selected.assets.trackingPixels.pixelId" placeholder="G-XXXX1234" class="w-full"
-                    @update:model-value="onChange" />
-                </div>
-              </div>
-              <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Events to track</label>
-                <UInput v-model="selected.assets.trackingPixels.events" placeholder="page_view, sign_up" class="w-full"
-                  @update:model-value="onChange" />
-              </div>
+              @update:selected="(v) => { selected!.assets.trackingPixels.selected = v; onChange() }"
+            >
+              <p class="text-xs text-gray-400">Add one pixel to start; add more as needed.</p>
+              <TrackingPixelsEditor v-model="selected.assets.trackingPixels.pixels" @change="onChange" />
             </AssetCard>
 
             <!-- Localization -->

@@ -20,16 +20,33 @@ const text = (v?: string) => (v ?? '').trim().length > 0
 export function assetComplete(key: AssetKey, assets: CampaignAssets): boolean {
   const a = assets[key]
   if (!a.selected) return false
-  if (key === 'localization') return assets.localization.languages.length > 0
+  if (key === 'emails') {
+    const e = assets.emails
+    return text(e.program) && text(e.description)
+  }
+  if (key === 'landingPages' || key === 'forms') {
+    const lf = assets[key]
+    // briefs.md marks all fields optional — count it done once any briefing input is provided.
+    return text(lf.description) || text(lf.externalLinks) || text(lf.briefingDoc)
+  }
   if (key === 'trackingPixels') {
     const t = assets.trackingPixels
-    return text(t.provider) && text(t.pixelId)
+    return (
+      t.pixels.length > 0 &&
+      t.pixels.every(
+        (p) =>
+          text(p.vendor) &&
+          text(p.pixelId) &&
+          text(p.pixelType) &&
+          text(p.script) &&
+          p.paths.some((path) => text(path.url)),
+      )
+    )
   }
-  const b = assets[key] as CampaignAssets['emailBriefing']
-  return text(b.brief) && text(b.briefingDoc)
+  return assets.localization.languages.length > 0
 }
 
-const ASSET_KEYS: AssetKey[] = ['emailBriefing', 'landingPages', 'forms', 'trackingPixels', 'localization']
+const ASSET_KEYS: AssetKey[] = ['emails', 'landingPages', 'forms', 'trackingPixels', 'localization']
 
 /** Assets & briefings = ONE field: at least one selected AND every selected one complete. */
 export function assetsSectionDone(c: Campaign): boolean {
@@ -37,9 +54,9 @@ export function assetsSectionDone(c: Campaign): boolean {
   return selected.length > 0 && selected.every((k) => assetComplete(k, c.assets))
 }
 
-/** Required-field model — totals to 16 fields across six sections. */
+/** Required-field model — totals to 17 fields across six sections. */
 export function computeSections(c: Campaign): SectionStatus[] {
-  const basics = [c.name, c.sbu, c.brand, c.campaignType, c.priority, c.language, c.costCenter]
+  const basics = [c.name, c.sbu, c.brand, c.website, c.campaignType, c.priority, c.language, c.costCenter]
   const schedule = [c.startDate, c.endDate]
   const targeting = [c.regions, c.channels]
   const goal = [c.goal, c.cta]

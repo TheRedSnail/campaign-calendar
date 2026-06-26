@@ -11,15 +11,21 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   admin: 'Admin',
 }
 
+/** SBU codes from the existing Henkel ticket system (see briefs.md). */
 export const SBU_OPTIONS = [
-  'Industrial',
-  'Automotive',
-  'Electronics',
-  'Packaging',
-  'General Manufacturing',
+  'ACA',
+  'ACE',
+  'ACC',
+  'AMC',
+  'AME',
+  'AMI',
+  'AMO',
+  'APC',
+  'APP',
+  'AQC',
 ]
 
-export const BRAND_OPTIONS: Brand[] = ['Loctite', 'Technomelt', 'Teroson', 'Bonderite']
+export const BRAND_OPTIONS: Brand[] = ['Next Henkel Adhesives', 'Bekron', 'Fester', 'OSI']
 
 export const TYPE_OPTIONS = [
   'Product relaunch',
@@ -43,21 +49,121 @@ export const LANGUAGE_OPTIONS = [
   'Italian',
 ]
 
+/** Country / region scope from the existing ticket system (see briefs.md). */
 export const REGION_OPTIONS = [
-  'Germany',
+  'Global',
+  'Regional - APAC',
+  'Regional - Middle East and Africa',
+  'Regional – Eastern Europe',
+  'Regional – North America',
+  'Regional – Western Europe',
+  'Regional- Latin America',
+  'Algeria',
+  'Argentina',
+  'Australia',
+  'Austria',
+  'Belgium',
+  'Brazil',
+  'Bulgaria',
+  'Canada',
+  'Chile',
+  'Colombia',
+  'Costa Rica',
+  'Croatia',
+  'Czech Republic',
+  'Denmark',
+  'El Salvador',
+  'Estonia',
+  'Finland',
   'France',
-  'Netherlands',
+  'Germany',
+  'Greece',
+  'Guatemala',
+  'Honduras',
+  'Hungary',
+  'India',
+  'Indonesia',
+  'Ireland',
+  'Israel',
   'Italy',
-  'Spain',
+  'Japan',
+  'Kenya',
+  'Latvia',
+  'Lithuania',
+  'Malaysia',
+  'Mexico',
+  'Morocco',
+  'Netherlands',
+  'New Zealand',
+  'Nicaragua',
+  'Norway',
+  'Pakistan',
+  'Panama',
+  'Peru',
+  'Philippines',
   'Poland',
+  'Portugal',
+  'Romania',
+  'Serbia',
+  'Singapore',
+  'Slovakia',
+  'Slovenia',
+  'South Africa',
+  'South Korea',
+  'Spain',
+  'Sweden',
+  'Switzerland',
+  'Taiwan',
+  'Thailand',
+  'Tunisia',
+  'Turkey',
+  'Ukraine',
+  'United Arab Emirates',
   'United Kingdom',
   'United States',
-  'China',
-  'Japan',
+  'Vietnam',
 ]
 
 /** Country = the scoping dimension for owners (one) and RUN-team users (many). Same list. */
 export const COUNTRY_OPTIONS = REGION_OPTIONS
+
+/** Websites a campaign can target (see briefs.md). */
+export const WEBSITE_OPTIONS = [
+  'Agorex',
+  'Bekron',
+  'Beta Website',
+  'Bonderite',
+  'Cascola',
+  'Ceresit',
+  'Cimsec',
+  'Contacts Henkel Adhesives',
+  'Fester',
+  'Glooly',
+  'Henkel Brand Hub',
+  'Henkel FQCE',
+  'Humidity Absorber',
+  'LePage',
+  'Loctite',
+  'Makroflex',
+  'Metylan',
+  'Moment',
+  'Next Henkel Adhesives',
+  'Oneweb',
+  'OSI',
+  'Other / External',
+  'Pattex',
+  'Perfax',
+  'Polybit',
+  'Pritt',
+  'Resistol',
+  'Rubson',
+  'Sista',
+  'Solvite',
+  'Tangit',
+  'Teroson',
+  'Thomsit',
+  'YouJustDo',
+]
 
 export const CHANNEL_OPTIONS = [
   'Email',
@@ -69,6 +175,41 @@ export const CHANNEL_OPTIONS = [
   'Print / PDF',
   'Display banner',
 ]
+
+/** Email program types asked for in the ticket system (see briefs.md). */
+export const EMAIL_PROGRAM_OPTIONS = [
+  'Email blast',
+  'Newsletter',
+  'Content download',
+  'Masterclass on demand',
+  'Discover nurture',
+  'New nurture journey',
+  'Request a consultation',
+  'Request a quote',
+  'Request a sample',
+  'Event',
+  'Webinar (live)',
+]
+
+/** Hidden/prefilled request type sent to DevOps for an email program (see briefs.md). */
+export const EMAIL_REQUEST_TYPE = 'Create a new Marketo program based on an existing flow/journey'
+
+/** Tracking-pixel vendors (see briefs.md). */
+export const PIXEL_VENDOR_OPTIONS = [
+  'Facebook (meta)',
+  'Google ads',
+  'Bing',
+  'Youtube',
+  'Instagram (meta)',
+  'TikTok',
+  'Snapchat',
+  'Pinterest',
+  'X (Twitter)',
+  'LinkedIn',
+  'Other (please describe in comments)',
+]
+
+export const PIXEL_TYPE_OPTIONS = ['Page View', 'Conversion']
 
 export const OWNER_OPTIONS = [
   'Markus Weber',

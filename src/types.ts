@@ -5,22 +5,46 @@ export type CampaignStatus =
   | 'briefed'
   | 'in_production'
 
-export type Brand = 'Loctite' | 'Technomelt' | 'Teroson' | 'Bonderite'
+export type Brand = 'Next Henkel Adhesives' | 'Bekron' | 'Fester' | 'OSI'
 
-/** Email briefing, Landing pages, Forms — a question + an uploaded briefing doc. */
-export interface BriefingAsset {
+/** Emails — pick a Marketo program type + describe it (see briefs.md). */
+export interface EmailAsset {
   selected: boolean
-  brief: string
-  reference?: string // optional, e.g. a landing-page reference URL
+  program: string // EMAIL_PROGRAM_OPTIONS
+  description: string
   briefingDoc: string // uploaded file name ('' = none; mock — no real upload)
+  /** Hidden/prefilled request type sent to DevOps but not shown to the user. */
+  requestType: string
 }
 
-/** Tracking pixel — placeholder text boxes (exact fields TBD). */
-export interface TrackingAsset {
+/** Landing pages & forms share one briefing (see briefs.md). */
+export interface LandingFormAsset {
   selected: boolean
-  provider: string
+  description: string // optional
+  externalLinks: string // WeTransfer / large-file links
+  briefingDoc: string // uploaded file name
+}
+
+/** One path/URL a pixel fires on. */
+export interface PixelPath {
+  url: string
+  comment: string
+}
+
+/** One tracking pixel (a campaign may have several). */
+export interface TrackingPixel {
+  vendor: string // PIXEL_VENDOR_OPTIONS
   pixelId: string
-  events: string
+  pixelType: string // PIXEL_TYPE_OPTIONS — Page View | Conversion
+  script: string
+  paths: PixelPath[] // starts with 1
+  briefingDoc: string
+}
+
+/** Tracking pixels — start with one open pixel, add more as needed (see briefs.md). */
+export interface TrackingPixelsAsset {
+  selected: boolean
+  pixels: TrackingPixel[]
 }
 
 /** Localization — add the languages the campaign needs. */
@@ -30,10 +54,10 @@ export interface LocalizationAsset {
 }
 
 export interface CampaignAssets {
-  emailBriefing: BriefingAsset
-  landingPages: BriefingAsset
-  forms: BriefingAsset
-  trackingPixels: TrackingAsset
+  emails: EmailAsset
+  landingPages: LandingFormAsset
+  forms: LandingFormAsset
+  trackingPixels: TrackingPixelsAsset
   localization: LocalizationAsset
 }
 
@@ -91,6 +115,9 @@ export interface Campaign {
   /** Primary market — drives RUN-team visibility and is preselected from the owner's profile. */
   country: string
 
+  /** Target website / brand site (see briefs.md). */
+  website: string
+
   // Targeting
   regions: string[]
   channels: string[]
@@ -102,6 +129,9 @@ export interface Campaign {
   // Ownership
   owner: string
   ownerEmail: string
+
+  /** CC watchers — extra email addresses kept in the loop (see briefs.md). */
+  watchers: string[]
 
   /** Campaign coordinator (marketing-ops PM) — the single point of contact. */
   coordinator?: string
