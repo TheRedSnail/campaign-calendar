@@ -6,10 +6,10 @@ import { useCampaigns } from '../composables/useCampaigns'
 import { shortDate } from '../utils/dates'
 
 const router = useRouter()
-const { selected, briefOpen, briefCampaign, closeDrawer } = useCampaigns()
+const { selected, briefOpen, briefCampaign, closeDrawer, drawerOpen } = useCampaigns()
 
 const step = ref<1 | 2>(1)
-
+const loading = ref(false)
 watch(briefOpen, (open) => {
   if (open) step.value = 1
 })
@@ -37,8 +37,10 @@ const dateRange = computed(() => {
   return `${shortDate(c.startDate)} – ${shortDate(c.endDate)} 2026`
 })
 
-function send() {
-  briefCampaign()
+async function send() {
+  loading.value = true
+  await briefCampaign()
+  loading.value = false
   step.value = 2
 }
 function done() {
@@ -49,6 +51,10 @@ function viewOnCalendar() {
   briefOpen.value = false
   closeDrawer()
   router.push({ name: 'calendar' })
+}
+function handleBack() {
+  drawerOpen.value = true
+  briefOpen.value = false
 }
 
 interface Row {
@@ -71,11 +77,8 @@ const basics = computed<Row[]>(() => {
 </script>
 
 <template>
-  <UModal
-    v-model:open="briefOpen"
-    :title="step === 1 ? 'Review campaign brief' : 'Campaign briefed'"
-    :ui="{ content: 'max-w-2xl' }"
-  >
+  <UModal v-model:open="briefOpen" :title="step === 1 ? 'Review campaign brief' : 'Campaign briefed'"
+    :ui="{ content: 'max-w-2xl' }">
     <template #content>
       <div v-if="selected" class="p-6">
         <!-- STEP 1 -->
@@ -148,12 +151,8 @@ const basics = computed<Row[]>(() => {
           <div class="mt-5 border-t border-gray-100 pt-4">
             <p class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Assets &amp; briefings</p>
             <div class="flex flex-wrap gap-x-5 gap-y-2">
-              <span
-                v-for="a in assetList"
-                :key="a.label"
-                class="inline-flex items-center gap-1.5 text-sm"
-                :class="a.on ? 'text-green-700' : 'text-gray-400'"
-              >
+              <span v-for="a in assetList" :key="a.label" class="inline-flex items-center gap-1.5 text-sm"
+                :class="a.on ? 'text-green-700' : 'text-gray-400'">
                 <UIcon :name="a.on ? 'i-lucide-check' : 'i-lucide-minus'" class="size-4" />
                 {{ a.label }}
               </span>
@@ -163,23 +162,19 @@ const basics = computed<Row[]>(() => {
           <div class="mt-5 border-t border-gray-100 pt-4">
             <p class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Brief will be sent to</p>
             <div class="flex flex-wrap gap-2">
-              <span
-                v-for="r in recipients"
-                :key="r.name"
-                class="inline-flex items-center gap-2 rounded-full bg-gray-50 py-1 pl-1 pr-3 text-sm"
-              >
-                <span class="flex size-6 items-center justify-center rounded-full bg-blue-100 text-[11px] font-semibold text-blue-700">
+              <span v-for="r in recipients" :key="r.name"
+                class="inline-flex items-center gap-2 rounded-full bg-gray-50 py-1 pl-1 pr-3 text-sm">
+                <span
+                  class="flex size-6 items-center justify-center rounded-full bg-blue-100 text-[11px] font-semibold text-blue-700">
                   {{ r.name.charAt(0) }}
                 </span>
                 <span class="font-medium text-gray-800">{{ r.name }}</span>
                 <span v-if="r.role" class="text-gray-400">· {{ r.role }}</span>
               </span>
-              <span
-                v-for="w in selected.watchers"
-                :key="w"
-                class="inline-flex items-center gap-2 rounded-full bg-gray-50 py-1 pl-1 pr-3 text-sm"
-              >
-                <span class="flex size-6 items-center justify-center rounded-full bg-gray-200 text-[11px] font-semibold text-gray-600">
+              <span v-for="w in selected.watchers" :key="w"
+                class="inline-flex items-center gap-2 rounded-full bg-gray-50 py-1 pl-1 pr-3 text-sm">
+                <span
+                  class="flex size-6 items-center justify-center rounded-full bg-gray-200 text-[11px] font-semibold text-gray-600">
                   <UIcon name="i-lucide-eye" class="size-3" />
                 </span>
                 <span class="font-medium text-gray-800">{{ w }}</span>
@@ -191,8 +186,8 @@ const basics = computed<Row[]>(() => {
           <div class="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
             <p class="text-sm text-gray-400">You cannot edit after briefing.</p>
             <div class="flex gap-2">
-              <UButton label="Back to edit" color="neutral" variant="outline" @click="briefOpen = false" />
-              <UButton label="Send brief" icon="i-lucide-arrow-right" trailing color="primary" @click="send" />
+              <UButton label="Back to edit" color="neutral" variant="outline" :disabled="loading" @click="handleBack" />
+              <UButton label="Send brief" icon="i-lucide-arrow-right" trailing color="primary" :loading @click="send" />
             </div>
           </div>
         </template>
