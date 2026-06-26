@@ -1,7 +1,6 @@
 import { computed, reactive } from 'vue'
 import type { Campaign, DevOpsTicket, TicketSla, TicketStage } from '../types'
 import { useCampaigns } from './useCampaigns'
-import { useAuth } from './useAuth'
 import { OWNER_OPTIONS, TODAY } from '../data/options'
 import {
   generateTickets,
@@ -13,7 +12,6 @@ import { supabase } from '../lib/supabase'
 import { rowToTicket, ticketToRow } from '../data/mappers'
 
 const { campaigns } = useCampaigns()
-const { profile } = useAuth()
 
 interface CoordState {
   tickets: DevOpsTicket[]
@@ -137,13 +135,12 @@ const dashboardKpis = computed(() => {
   }
 })
 
+// "My campaigns" = every active campaign in the coordinator's scope (rows are already
+// RLS-scoped to what they may see), not just ones whose free-text `coordinator` field
+// matches their name — that field is blank on most campaigns and hid in-scope work.
 const myCampaigns = computed(() =>
   campaigns.value
-    .filter(
-      (c) =>
-        (c.status === 'in_production' || c.status === 'briefed') &&
-        c.coordinator === profile.value?.full_name,
-    )
+    .filter((c) => c.status === 'in_production' || c.status === 'briefed')
     .sort((a, b) => SLA_RANK[campaignSla(b)] - SLA_RANK[campaignSla(a)]),
 )
 
