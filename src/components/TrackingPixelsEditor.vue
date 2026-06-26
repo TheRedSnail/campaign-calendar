@@ -50,15 +50,15 @@ const onChange = () => emit('change')
 
       <div class="grid grid-cols-2 gap-2.5">
         <div>
-          <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel vendor</label>
+          <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel vendor <span class="text-red-500">*</span></label>
           <USelect v-model="pixel.vendor" :items="PIXEL_VENDOR_OPTIONS" placeholder="Select vendor" class="w-full" @update:model-value="onChange" />
         </div>
         <div>
-          <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel type</label>
+          <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel type <span class="text-red-500">*</span></label>
           <USelect v-model="pixel.pixelType" :items="PIXEL_TYPE_OPTIONS" placeholder="Select type" class="w-full" @update:model-value="onChange" />
         </div>
         <div>
-          <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel ID</label>
+          <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel ID <span class="text-red-500">*</span></label>
           <UInput v-model="pixel.pixelId" placeholder="e.g. 1234567890" class="w-full" @update:model-value="onChange" />
         </div>
         <div>
@@ -68,12 +68,12 @@ const onChange = () => emit('change')
       </div>
 
       <div class="mt-2.5">
-        <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel script</label>
+        <label class="mb-1 block text-[13px] font-medium text-gray-500">Pixel script <span class="text-red-500">*</span></label>
         <UTextarea v-model="pixel.script" :rows="2" placeholder="Paste the pixel script" class="w-full" @update:model-value="onChange" />
       </div>
 
       <div class="mt-3">
-        <label class="mb-1 block text-[13px] font-medium text-gray-500">Paths</label>
+        <label class="mb-1 block text-[13px] font-medium text-gray-500">Paths <span class="text-red-500">*</span></label>
         <div class="flex flex-col gap-2">
           <div v-for="(path, pj) in pixel.paths" :key="pj" class="flex items-start gap-2">
             <div class="grid flex-1 grid-cols-2 gap-2">

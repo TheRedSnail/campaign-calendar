@@ -20,15 +20,9 @@ const text = (v?: string) => (v ?? '').trim().length > 0
 export function assetComplete(key: AssetKey, assets: CampaignAssets): boolean {
   const a = assets[key]
   if (!a.selected) return false
-  if (key === 'emails') {
-    const e = assets.emails
-    return text(e.program) && text(e.description)
-  }
-  if (key === 'landingPages' || key === 'forms') {
-    const lf = assets[key]
-    // briefs.md marks all fields optional — count it done once any briefing input is provided.
-    return text(lf.description) || text(lf.externalLinks) || text(lf.briefingDoc)
-  }
+  // Required fields per briefs.md (see the red * markers in the drawer).
+  if (key === 'emails') return text(assets.emails.program) // program is the only required field
+  if (key === 'landingPages' || key === 'forms') return true // all fields optional
   if (key === 'trackingPixels') {
     const t = assets.trackingPixels
     return (
