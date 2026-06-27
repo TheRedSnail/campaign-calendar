@@ -7,6 +7,7 @@ import EmailTagInput from './EmailTagInput.vue'
 import AssetCard from './AssetCard.vue'
 import FileUpload from './FileUpload.vue'
 import TrackingPixelsEditor from './TrackingPixelsEditor.vue'
+import HelpHint from './HelpHint.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
 import { useOptions } from '../composables/useOptions'
@@ -93,7 +94,10 @@ const check = 'i-lucide-check'
     <template #header>
       <div class="flex w-full items-start justify-between gap-3">
         <div>
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Campaign details</p>
+          <p class="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            Campaign details
+            <HelpHint topic="brief.overview" />
+          </p>
           <h2 class="mt-0.5 text-lg font-semibold text-gray-900 dark:text-white">
             {{ selected?.name || 'New campaign' }}
           </h2>
@@ -125,7 +129,7 @@ const check = 'i-lucide-check'
           <!-- Basics -->
           <section class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Basics</h3>
+              <h3 class="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">Basics <HelpHint topic="brief.basics" /></h3>
               <span class="text-xs font-medium" :class="badgeClass(sectionMap.basics)">{{ badgeText(sectionMap.basics)
               }}</span>
             </div>
@@ -161,14 +165,14 @@ const check = 'i-lucide-check'
                   @update:model-value="onChange" />
               </div>
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Campaign type <span
-                    class="text-red-500">*</span></label>
+                <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Campaign type <span
+                    class="text-red-500">*</span><HelpHint topic="brief.campaignType" /></label>
                 <USelect v-model="selected.campaignType" :items="campaignTypes" placeholder="Select type" class="w-full"
                   @update:model-value="onChange" />
               </div>
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Priority <span
-                    class="text-red-500">*</span></label>
+                <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Priority <span
+                    class="text-red-500">*</span><HelpHint topic="brief.priority" /></label>
                 <USelect v-model="selected.priority" :items="priorities" placeholder="Select priority"
                   class="w-full" @update:model-value="onChange" />
               </div>
@@ -179,8 +183,8 @@ const check = 'i-lucide-check'
                   class="w-full" @update:model-value="onChange" />
               </div>
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Cost center <span
-                    class="text-red-500">*</span></label>
+                <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Cost center <span
+                    class="text-red-500">*</span><HelpHint topic="brief.costCenter" /></label>
                 <UInput v-model="selected.costCenter" placeholder="e.g. CC-4021" class="w-full"
                   :trailing-icon="selected.costCenter ? check : undefined" @update:model-value="onChange" />
               </div>
@@ -190,7 +194,7 @@ const check = 'i-lucide-check'
           <!-- Schedule -->
           <section class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Schedule</h3>
+              <h3 class="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">Schedule <HelpHint topic="brief.schedule" /></h3>
               <span class="text-xs font-medium" :class="badgeClass(sectionMap.schedule)">{{
                 badgeText(sectionMap.schedule) }}</span>
             </div>
@@ -211,19 +215,19 @@ const check = 'i-lucide-check'
           <!-- Targeting -->
           <section class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Targeting</h3>
+              <h3 class="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">Targeting <HelpHint topic="brief.targeting" /></h3>
               <span class="text-xs font-medium" :class="badgeClass(sectionMap.targeting)">{{
                 badgeText(sectionMap.targeting) }}</span>
             </div>
             <div>
-              <label class="mb-1 block text-[13px] font-medium text-gray-500">Region(s) / countries <span
-                  class="text-red-500">*</span></label>
+              <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Region(s) / countries <span
+                  class="text-red-500">*</span><HelpHint topic="brief.regions" /></label>
               <TagMultiSelect v-model="selected.regions" :options="regionOptions" placeholder="Add regions"
                 @update:model-value="onChange" />
             </div>
             <div>
-              <label class="mb-1 block text-[13px] font-medium text-gray-500">Channels <span
-                  class="text-red-500">*</span></label>
+              <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Channels <span
+                  class="text-red-500">*</span><HelpHint topic="brief.channels" /></label>
               <TagMultiSelect v-model="selected.channels" :options="channels" placeholder="Select channels"
                 @update:model-value="onChange" />
             </div>
@@ -232,19 +236,19 @@ const check = 'i-lucide-check'
           <!-- Goal / CTA -->
           <section class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Goal / CTA</h3>
+              <h3 class="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">Goal / CTA <HelpHint topic="brief.goalSection" /></h3>
               <span class="text-xs font-medium" :class="badgeClass(sectionMap.goal)">{{ badgeText(sectionMap.goal)
               }}</span>
             </div>
             <div>
-              <label class="mb-1 block text-[13px] font-medium text-gray-500">Goal <span
-                  class="text-red-500">*</span></label>
+              <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Goal <span
+                  class="text-red-500">*</span><HelpHint topic="brief.goal" /></label>
               <UInput v-model="selected.goal" placeholder="e.g. Generate 200 MQLs from OEM accounts" class="w-full"
                 :trailing-icon="selected.goal ? check : undefined" @update:model-value="onChange" />
             </div>
             <div>
-              <label class="mb-1 block text-[13px] font-medium text-gray-500">Call to action <span
-                  class="text-red-500">*</span></label>
+              <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Call to action <span
+                  class="text-red-500">*</span><HelpHint topic="brief.cta" /></label>
               <UInput v-model="selected.cta" placeholder="e.g. Request a free sample kit" class="w-full"
                 :trailing-icon="selected.cta ? check : undefined" @update:model-value="onChange" />
             </div>
@@ -253,7 +257,7 @@ const check = 'i-lucide-check'
           <!-- Ownership -->
           <section class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Ownership</h3>
+              <h3 class="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">Ownership <HelpHint topic="brief.ownership" /></h3>
               <span class="text-xs font-medium" :class="badgeClass(sectionMap.ownership)">{{
                 badgeText(sectionMap.ownership) }}</span>
             </div>
@@ -265,14 +269,14 @@ const check = 'i-lucide-check'
                   @update:model-value="onChange" />
               </div>
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Owner email <span
-                    class="text-red-500">*</span></label>
+                <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Owner email <span
+                    class="text-red-500">*</span><HelpHint topic="brief.ownerEmail" /></label>
                 <UInput v-model="selected.ownerEmail" placeholder="name@henkel.com" class="w-full"
                   :trailing-icon="selected.ownerEmail ? check : undefined" @update:model-value="onChange" />
               </div>
             </div>
             <div>
-              <label class="mb-1 block text-[13px] font-medium text-gray-500">CC watchers</label>
+              <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">CC watchers <HelpHint topic="brief.ccWatchers" /></label>
               <EmailTagInput v-model="selected.watchers" placeholder="Add email + Enter"
                 @update:model-value="onChange" />
               <p class="mt-1 text-xs text-gray-400">People who stay in the loop — updated alongside the owner.</p>
@@ -283,7 +287,7 @@ const check = 'i-lucide-check'
         <!-- Assets & briefings -->
         <section class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Assets &amp; briefings</h3>
+            <h3 class="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">Assets &amp; briefings <HelpHint topic="brief.assets" /></h3>
             <span class="text-xs font-medium" :class="badgeClass(sectionMap.assets)">{{ badgeText(sectionMap.assets)
             }}</span>
           </div>
@@ -296,8 +300,8 @@ const check = 'i-lucide-check'
               :complete="assetComplete('emails', selected.assets)"
               @update:selected="(v) => { selected!.assets.emails.selected = v; onChange() }">
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Which program do you need to create?
-                  <span class="text-red-500">*</span></label>
+                <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Which program do you need to create?
+                  <span class="text-red-500">*</span><HelpHint topic="brief.emailProgram" /></label>
                 <USelect v-model="selected.assets.emails.program" :items="emailPrograms"
                   placeholder="Select program" class="w-full" @update:model-value="onChange" />
               </div>
@@ -347,7 +351,7 @@ const check = 'i-lucide-check'
             <AssetCard label="Tracking pixels" :selected="selected.assets.trackingPixels.selected"
               :complete="assetComplete('trackingPixels', selected.assets)"
               @update:selected="(v) => { selected!.assets.trackingPixels.selected = v; onChange() }">
-              <p class="text-xs text-gray-400">Add one pixel to start; add more as needed.</p>
+              <p class="flex items-center gap-1 text-xs text-gray-400">Add one pixel to start; add more as needed. <HelpHint topic="brief.trackingPixels" /></p>
               <TrackingPixelsEditor v-model="selected.assets.trackingPixels.pixels" @change="onChange" />
             </AssetCard>
 
@@ -356,7 +360,7 @@ const check = 'i-lucide-check'
               :complete="assetComplete('localization', selected.assets)"
               @update:selected="(v) => { selected!.assets.localization.selected = v; onChange() }">
               <div>
-                <label class="mb-1 block text-[13px] font-medium text-gray-500">Languages</label>
+                <label class="mb-1 flex items-center gap-1 text-[13px] font-medium text-gray-500">Languages <HelpHint topic="brief.localization" /></label>
                 <TagMultiSelect v-model="selected.assets.localization.languages" :options="languages"
                   placeholder="Add languages" @update:model-value="onChange" />
               </div>

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import KpiCard from '../components/KpiCard.vue'
 import StageStepper from '../components/StageStepper.vue'
+import HelpHint from '../components/HelpHint.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
 import { useTimelineConfig } from '../composables/useTimelineConfig'
@@ -93,16 +94,18 @@ function back() {
       <div class="mx-auto flex max-w-[1320px] flex-col gap-4 p-6">
         <!-- KPI cards -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="Overall progress" :value="`${campaignProgress(campaign)}%`" :progress="campaignProgress(campaign)" />
+          <KpiCard label="Overall progress" help="prod.progress" :value="`${campaignProgress(campaign)}%`" :progress="campaignProgress(campaign)" />
           <KpiCard
             label="SLA adherence"
+            help="prod.sla"
             :value="`${sla.onTrack} / ${sla.total}`"
             :caption="`${sla.onTrack} on track · ${sla.atRisk} at risk · ${sla.overdue} overdue`"
             :caption-class="sla.overdue ? 'text-red-600' : sla.atRisk ? 'text-amber-600' : 'text-green-600'"
           />
-          <KpiCard label="Work items" :value="String(sla.total)" caption="across operational teams" />
+          <KpiCard label="Work items" help="prod.workItems" :value="String(sla.total)" caption="across operational teams" />
           <KpiCard
             label="Time to go-live"
+            help="prod.timeToGoLive"
             :value="goLiveWorkingDays"
             :caption="`working days · go-live ${fmtDate(goLiveDate)}`"
           />
@@ -110,7 +113,7 @@ function back() {
 
         <!-- Campaign progress (overarching broad statuses) -->
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
-          <p class="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress</p>
+          <p class="mb-5 flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress <HelpHint topic="prod.stages" /></p>
           <StageStepper :stages="TICKET_STAGES" :current-index="currentIndex" />
         </div>
 
@@ -118,7 +121,7 @@ function back() {
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
           <div class="mb-4 flex items-start justify-between">
             <div>
-              <h2 class="text-base font-semibold text-gray-900">Production timeline</h2>
+              <h2 class="flex items-center gap-1 text-base font-semibold text-gray-900">Production timeline <HelpHint topic="prod.timeline" /></h2>
               <p class="mt-0.5 text-xs text-gray-400">
                 {{ tickets.length }} work items · {{ timeline.phaseBands.length }} phases · brief →
                 Ready for UAT ({{ timeline.uatIdx }} business days)
@@ -129,6 +132,7 @@ function back() {
               <span class="inline-flex items-center gap-1.5"><span class="size-3 rounded-sm bg-amber-500" />Current stage</span>
               <span class="inline-flex items-center gap-1.5"><span class="size-3 rounded-sm bg-gray-200" />Upcoming</span>
               <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-green-600" />Live ✓</span>
+              <HelpHint topic="prod.legend" align="end" />
             </div>
           </div>
 

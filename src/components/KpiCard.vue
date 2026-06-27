@@ -1,16 +1,23 @@
 <script setup lang="ts">
+import HelpHint from './HelpHint.vue'
+
 defineProps<{
   label: string
   value: string
   caption?: string
   captionClass?: string
   progress?: number
+  /** Optional HELP topic key — renders a help hint next to the label. */
+  help?: string
 }>()
 </script>
 
 <template>
   <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-card transition-shadow hover:shadow-card-hover">
-    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ label }}</p>
+    <p class="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+      {{ label }}
+      <HelpHint v-if="help" :topic="help" />
+    </p>
     <p class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{{ value }}</p>
 
     <div v-if="progress !== undefined" class="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-100">

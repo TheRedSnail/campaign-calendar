@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import StatusBadge from './StatusBadge.vue'
+import HelpHint from './HelpHint.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { shortDate } from '../utils/dates'
 
@@ -149,7 +150,7 @@ const basics = computed<Row[]>(() => {
           </div>
 
           <div class="mt-5 border-t border-gray-100 pt-4">
-            <p class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Assets &amp; briefings</p>
+            <p class="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Assets &amp; briefings <HelpHint topic="brief.assetsChecklist" /></p>
             <div class="flex flex-wrap gap-x-5 gap-y-2">
               <span v-for="a in assetList" :key="a.label" class="inline-flex items-center gap-1.5 text-sm"
                 :class="a.on ? 'text-green-700' : 'text-gray-400'">
@@ -160,7 +161,7 @@ const basics = computed<Row[]>(() => {
           </div>
 
           <div class="mt-5 border-t border-gray-100 pt-4">
-            <p class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Brief will be sent to</p>
+            <p class="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Brief will be sent to <HelpHint topic="brief.recipients" /></p>
             <div class="flex flex-wrap gap-2">
               <span v-for="r in recipients" :key="r.name"
                 class="inline-flex items-center gap-2 rounded-full bg-gray-50 py-1 pl-1 pr-3 text-sm">
@@ -184,7 +185,7 @@ const basics = computed<Row[]>(() => {
           </div>
 
           <div class="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
-            <p class="text-sm text-gray-400">You cannot edit after briefing.</p>
+            <p class="flex items-center gap-1 text-sm text-gray-400">You cannot edit after briefing. <HelpHint topic="brief.afterSend" /></p>
             <div class="flex gap-2">
               <UButton label="Back to edit" color="neutral" variant="outline" :disabled="loading" @click="handleBack" />
               <UButton label="Send brief" icon="i-lucide-arrow-right" trailing color="primary" :loading @click="send" />
