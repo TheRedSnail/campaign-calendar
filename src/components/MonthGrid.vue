@@ -92,6 +92,7 @@ function barStyle(bar: MonthBar) {
             v-for="bar in bars[w]"
             :key="bar.id + '-' + bar.startCol"
             type="button"
+            data-tutorial-id="campaign-bar"
             class="pointer-events-auto absolute flex h-[18px] items-center gap-1.5 overflow-hidden rounded-md px-2 text-xs font-medium text-white shadow-sm transition hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
             :class="STATUS_META[bar.campaign.status].bg"
             :style="barStyle(bar)"

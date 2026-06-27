@@ -45,7 +45,7 @@ const channelOptions = computed(() => order(campaigns.value.flatMap((c) => c.cha
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-2 border-b border-gray-200 bg-white px-6 py-2.5">
+  <div data-tutorial-id="filters" class="flex flex-wrap items-center gap-2 border-b border-gray-200 bg-white px-6 py-2.5">
     <span
       v-if="viewMode === 'timeline'"
       class="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700"

@@ -3,12 +3,19 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useAuth } from '../composables/useAuth'
+import { useTutorial } from '../composables/useTutorial'
 import { ROLE_LABELS } from '../data/options'
 import { addMonths, monthLabel } from '../utils/dates'
 
 const router = useRouter()
 const { currentMonth, viewMode, filters, newCampaign } = useCampaigns()
 const { canSeeCoordinator, isAdmin, isOwner, role, displayName, logout } = useAuth()
+const { activeTourId, startTour, close } = useTutorial()
+
+function toggleTutorial() {
+  if (activeTourId.value) close()
+  else startTour('calendar')
+}
 
 async function onLogout() {
   await logout()
@@ -71,7 +78,10 @@ function today() {
         class="w-56"
       />
 
-      <div class="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 text-sm font-medium">
+      <div
+        data-tutorial-id="view-toggle"
+        class="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 text-sm font-medium"
+      >
         <button
           type="button"
           class="rounded-md px-3 py-1 transition"
@@ -89,6 +99,16 @@ function today() {
           Timeline
         </button>
       </div>
+
+      <UButton
+        icon="i-lucide-graduation-cap"
+        :color="activeTourId ? 'primary' : 'neutral'"
+        variant="ghost"
+        size="sm"
+        aria-label="Tutorial"
+        title="Take the calendar tour"
+        @click="toggleTutorial"
+      />
 
       <UButton
         v-if="canSeeCoordinator"
@@ -120,7 +140,7 @@ function today() {
         size="sm"
       />
 
-      <UButton v-if="canCreate" icon="i-lucide-plus" label="New campaign" color="primary" size="sm" @click="newCampaign" />
+      <UButton v-if="canCreate" data-tutorial-id="new-campaign" icon="i-lucide-plus" label="New campaign" color="primary" size="sm" @click="newCampaign" />
 
       <!-- User chip -->
       <div class="flex items-center gap-2 border-l border-gray-200 pl-3">

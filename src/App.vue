@@ -3,6 +3,7 @@ import { watch } from 'vue'
 import { useAuth } from './composables/useAuth'
 import { useCampaigns } from './composables/useCampaigns'
 import { useCoordinator } from './composables/useCoordinator'
+import TutorialOverlay from './components/TutorialOverlay.vue'
 
 const { session } = useAuth()
 const { loadCampaigns, reset } = useCampaigns()
@@ -28,5 +29,6 @@ watch(
 <template>
   <UApp>
     <RouterView />
+    <TutorialOverlay />
   </UApp>
 </template>

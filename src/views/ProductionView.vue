@@ -7,6 +7,7 @@ import HelpHint from '../components/HelpHint.vue'
 import { useCampaigns } from '../composables/useCampaigns'
 import { useCoordinator } from '../composables/useCoordinator'
 import { useTimelineConfig } from '../composables/useTimelineConfig'
+import { useTutorial } from '../composables/useTutorial'
 import { TICKET_STAGES, fmtDate } from '../data/coordinator'
 import { TODAY, STATUS_META } from '../data/options'
 import { buildProductionTimeline, type GanttRow } from '../utils/production'
@@ -16,6 +17,12 @@ const router = useRouter()
 const { campaigns } = useCampaigns()
 const { ticketsFor, campaignStageIndex, campaignProgress, slaBreakdown } = useCoordinator()
 const { phases } = useTimelineConfig()
+const { activeTourId, startTour, close: closeTutorial } = useTutorial()
+
+function toggleTutorial() {
+  if (activeTourId.value) closeTutorial()
+  else startTour('golive')
+}
 
 const campaign = computed(() => campaigns.value.find((c) => c.id === route.params.id))
 const tickets = computed(() => (campaign.value ? ticketsFor(campaign.value.id) : []))
@@ -88,12 +95,21 @@ function back() {
             Go-live <span class="font-semibold text-gray-800">{{ fmtDate(goLiveDate) }}</span>
           </span>
           <UButton label="View brief" color="neutral" variant="outline" size="sm" @click="back" />
+          <UButton
+            icon="i-lucide-graduation-cap"
+            :color="activeTourId ? 'primary' : 'neutral'"
+            variant="ghost"
+            size="sm"
+            aria-label="Tutorial"
+            title="Take the go-live tour"
+            @click="toggleTutorial"
+          />
         </div>
       </header>
 
       <div class="mx-auto flex max-w-[1320px] flex-col gap-4 p-6">
         <!-- KPI cards -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div data-tutorial-id="prod-kpis" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard label="Overall progress" help="prod.progress" :value="`${campaignProgress(campaign)}%`" :progress="campaignProgress(campaign)" />
           <KpiCard
             label="SLA adherence"
@@ -112,13 +128,13 @@ function back() {
         </div>
 
         <!-- Campaign progress (overarching broad statuses) -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
+        <div data-tutorial-id="prod-stages" class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
           <p class="mb-5 flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Campaign progress <HelpHint topic="prod.stages" /></p>
           <StageStepper :stages="TICKET_STAGES" :current-index="currentIndex" />
         </div>
 
         <!-- Production timeline (Gantt) -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
+        <div data-tutorial-id="prod-timeline" class="rounded-xl border border-gray-200 bg-white p-5 shadow-card">
           <div class="mb-4 flex items-start justify-between">
             <div>
               <h2 class="flex items-center gap-1 text-base font-semibold text-gray-900">Production timeline <HelpHint topic="prod.timeline" /></h2>
